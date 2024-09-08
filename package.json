@@ -1,0 +1,8 @@
+{
+  "name": "typewriter-tools",
+  "version": "1.0.0",
+  "description": "tools to manipulate mdx files for blogging",
+  "main": "index.js",
+  "author": "tancredesimonin",
+  "license": "MIT"
+}
