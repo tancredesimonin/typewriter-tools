@@ -9,14 +9,14 @@ import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
 
 export const MDX_SERIES_LIST_PAGE_FILE_NAME = "_series";
 
-type MDXPageSeriesListMetadata = {
+type MDXSerieslistPageMetadata = {
   title: string;
   catchline: string;
   description: string;
   updatedAt?: string;
 };
-const allowedKeys: Set<keyof MDXPageSeriesListMetadata> = new Set<
-  keyof MDXPageSeriesListMetadata
+const allowedKeys: Set<keyof MDXSerieslistPageMetadata> = new Set<
+  keyof MDXSerieslistPageMetadata
 >(["title", "catchline", "description", "updatedAt"]);
 
 export type PageSeriesList = {
@@ -47,7 +47,7 @@ function parseFrontmatter(fileContent: string) {
   }
 
   let frontMatterLines = frontMatterBlock.trim().split("\n");
-  let metadata: Partial<MDXPageSeriesListMetadata> = {};
+  let metadata: Partial<MDXSerieslistPageMetadata> = {};
 
   frontMatterLines.forEach((line) => {
     let [key, ...valueArr] = line.split(": ");
@@ -57,18 +57,18 @@ function parseFrontmatter(fileContent: string) {
       );
     }
 
-    if (allowedKeys.has(key as keyof MDXPageSeriesListMetadata)) {
+    if (allowedKeys.has(key as keyof MDXSerieslistPageMetadata)) {
       let value = valueArr.join(": ").trim();
       switch (key) {
         case "tags":
           // Remove the brackets and split by commas
           value = value.replace(/^\[|\]$/g, "");
-          metadata[key as keyof MDXPageSeriesListMetadata] = value
+          metadata[key as keyof MDXSerieslistPageMetadata] = value
             .split(",")
             .map((tag) => removeQuotes(tag.trim())) as any;
           break;
         default:
-          metadata[key as keyof MDXPageSeriesListMetadata] = removeQuotes(
+          metadata[key as keyof MDXSerieslistPageMetadata] = removeQuotes(
             value
           ) as any;
       }
@@ -79,7 +79,7 @@ function parseFrontmatter(fileContent: string) {
     }
   });
 
-  return { metadata: metadata as MDXPageSeriesListMetadata, content };
+  return { metadata: metadata as MDXSerieslistPageMetadata, content };
 }
 
 function readMDXFile(filePath: string) {

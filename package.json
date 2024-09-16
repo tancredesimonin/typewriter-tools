@@ -4,6 +4,15 @@
   "description": "tools to manipulate mdx files for blogging",
   "author": "tancredesimonin",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tancredesimonin/typewriter-tools.git"
+  },
+  "keywords": [
+    "mdx",
+    "blog",
+    "tools"
+  ],
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^18",
