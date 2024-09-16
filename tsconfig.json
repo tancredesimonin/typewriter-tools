@@ -2,6 +2,11 @@
   "include": ["src/**/*.ts"],
   "compilerOptions": {
     "types": ["node"],
+    "typeRoots": [
+      "./typewriter-tools/server",
+      "./typewriter-tools/client",
+      "node_modules/@types"
+    ],
     "target": "es2015",
     "module": "es2015",
     "moduleResolution": "node",
