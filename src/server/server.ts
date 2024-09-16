@@ -17,7 +17,6 @@ import { getMDXPageSeriesList, PageSeriesList } from "./mdx/series-list";
 import { getMDXSeries, Serie } from "./mdx/series";
 
 export class TypewriterContent<T extends string> {
-  private config: TypewriterConfig<T>;
   private data: {
     homePages: HomePage[];
     articles: Article[];
@@ -31,8 +30,7 @@ export class TypewriterContent<T extends string> {
   };
   private router: TypewriterClientRouter<T>;
 
-  constructor(config: TypewriterConfig<T>, router: TypewriterClientRouter<T>) {
-    this.config = config;
+  constructor(_config: TypewriterConfig<T>, router: TypewriterClientRouter<T>) {
     this.router = router;
     this.data = {
       homePages: getMDXPageHome(),
