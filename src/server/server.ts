@@ -17,9 +17,12 @@ import { PageTagsList, Tag } from "../shared/types/tags";
 import { PageSeriesList, Serie } from "../shared/types/series";
 import { getMDXPageCategoriesList } from "./mdx/categories-list";
 import { getMDXSeries } from "./mdx/series";
+import { getMDXWebsite } from "./mdx/website";
+import { Website } from "../shared/types/website";
 
 export class TypewriterContent<T extends string> {
   private data: {
+    websites: Website[];
     homePages: HomePage[];
     articles: Article[];
     articlesBasePage: PageArticlesList[];
@@ -35,6 +38,7 @@ export class TypewriterContent<T extends string> {
   constructor(_config: TypewriterConfig<T>, router: TypewriterClientRouter<T>) {
     this.router = router;
     this.data = {
+      websites: getMDXWebsite(),
       homePages: getMDXPageHome(),
       articles: getMDXArticles(),
       articlesBasePage: getMDXPageArticlesList(),
@@ -68,6 +72,21 @@ export class TypewriterContent<T extends string> {
       | PageTagsList[]
   ) {
     return collection.map((item) => item.locale) as T[];
+  }
+
+  get website() {
+    return {
+      websites: this.data.websites,
+      website: (locale: T) => {
+        const website = this.data.websites.find(
+          (website) => website.locale === locale
+        );
+        if (!website) {
+          throw new Error(`No website found for locale ${locale}`);
+        }
+        return website;
+      },
+    };
   }
 
   get home() {
