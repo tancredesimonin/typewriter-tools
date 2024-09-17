@@ -126,42 +126,7 @@ export function getMDXArticles(
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 
   return mdxFiles.map((file) => {
-    let { metadata, content } = readMDXFile(path.join(dir, file));
-
-    let fileName = path.basename(file, path.extname(file));
-    let locale = getMDXFileLocale(fileName);
-    let slug = getMDXFileSlug(fileName);
-    let isInSerie: { slug: string; order: number } | undefined = undefined;
-
-    validateCategoryExists(metadata.category, locale);
-
-    if (metadata.serie && metadata.serieOrder) {
-      validateSerieExists(metadata.serie, locale);
-      isInSerie = {
-        slug: metadata.serie,
-        order: metadata.serieOrder,
-      };
-    }
-
-    return {
-      title: metadata.title,
-      catchline: metadata.catchline,
-      slug,
-      locale,
-      description: metadata.description,
-      publishedAt: metadata.publishedAt,
-      updatedAt: metadata.updatedAt ?? metadata.publishedAt,
-      content,
-      seo: {
-        metaTitle: metadata.title,
-        metaDescription: metadata.description,
-      },
-      meta: {
-        tags: metadata.tags,
-        category: metadata.category,
-        serie: isInSerie,
-      },
-    };
+    return mapFromMDXToArticle(dir, file);
   });
 }
 
@@ -190,6 +155,54 @@ export function upsertMDXArticle(
   article: Article,
   stage: TypewriterStage = "published"
 ): void {
+  const { content, filePath } = mapFromArticleToMDX(article, stage);
+
+  writeFileSync(filePath, content);
+}
+
+export function mapFromMDXToArticle(dir: string, file: string): Article {
+  let { metadata, content } = readMDXFile(path.join(dir, file));
+
+  let fileName = path.basename(file, path.extname(file));
+  let locale = getMDXFileLocale(fileName);
+  let slug = getMDXFileSlug(fileName);
+  let isInSerie: { slug: string; order: number } | undefined = undefined;
+
+  validateCategoryExists(metadata.category, locale);
+
+  if (metadata.serie && metadata.serieOrder) {
+    validateSerieExists(metadata.serie, locale);
+    isInSerie = {
+      slug: metadata.serie,
+      order: metadata.serieOrder,
+    };
+  }
+
+  return {
+    title: metadata.title,
+    catchline: metadata.catchline,
+    slug,
+    locale,
+    description: metadata.description,
+    publishedAt: metadata.publishedAt,
+    updatedAt: metadata.updatedAt ?? metadata.publishedAt,
+    content,
+    seo: {
+      metaTitle: metadata.title,
+      metaDescription: metadata.description,
+    },
+    meta: {
+      tags: metadata.tags,
+      category: metadata.category,
+      serie: isInSerie,
+    },
+  };
+}
+
+export function mapFromArticleToMDX(
+  article: Article,
+  stage: TypewriterStage = "published"
+): { content: string; filePath: string } {
   const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
   const dir = path.join(process.cwd(), "content", stageFolder);
   const articleFileName = `${article.publishedAt}-${article.slug}.${article.locale}.mdx`;
@@ -210,5 +223,5 @@ ${article.meta.serie ? `serieOrder: ${article.meta.serie.order}` : ""}
 ${article.content}
 `;
 
-  writeFileSync(articleFilePath, articleContent);
+  return { content: articleContent, filePath: articleFilePath };
 }
