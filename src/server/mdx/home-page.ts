@@ -6,6 +6,7 @@ import {
   removeQuotes,
 } from "../frontmatter/frontmatter.utils";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
+import { HomePage } from "../../shared/types/pages";
 
 export const MDX_HOME_PAGE_FILE_NAME = "home";
 
@@ -19,20 +20,6 @@ type MDXHomePageMetadata = {
 const allowedKeys: Set<keyof MDXHomePageMetadata> = new Set<
   keyof MDXHomePageMetadata
 >(["title", "catchline", "description", "updatedAt", "tags"]);
-
-export type HomePage = {
-  title: string;
-  catchline: string;
-  locale: string;
-  description: string;
-  updatedAt: string;
-  content: string;
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-  };
-  meta: {};
-};
 
 function parseFrontmatter(fileContent: string) {
   let match = frontmatterRegex.exec(fileContent);

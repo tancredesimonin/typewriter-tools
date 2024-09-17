@@ -1,6 +1,6 @@
 # Typewriter tools
 
-This is a collection of tools for the typewriter project.
+This is a collection of tools for building static websites using MDX.
 
 ## Links
 
@@ -20,3 +20,5 @@ npm install typewriter-tools
 ```bash
 yarn add typewriter-tools
 ```
+
+## 🏗️ Usage guide in progress

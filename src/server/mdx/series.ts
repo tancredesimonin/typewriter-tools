@@ -5,10 +5,10 @@ import {
   getMDXFilesInDir,
   removeQuotes,
 } from "../frontmatter/frontmatter.utils";
-import dynamicIconImports from "lucide-react/dynamicIconImports";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
-import { Color, getDynamicColor } from "../frontmatter/colors.utils";
-import { getDynamicIcon } from "../frontmatter/icons.utils";
+import { getDynamicColor } from "../../shared/utils/colors.utils";
+import { getDynamicIcon } from "../../shared/utils/icons.utils";
+import { Serie } from "../../shared/types/series";
 
 type MDXSerieMetadata = {
   title: string;
@@ -22,21 +22,6 @@ type MDXSerieMetadata = {
 const allowedKeys: Set<keyof MDXSerieMetadata> = new Set<
   keyof MDXSerieMetadata
 >(["title", "catchline", "description", "icon", "color"]);
-
-export type Serie = {
-  title: string;
-  catchline: string;
-  slug: string;
-  locale: string;
-  description: string;
-  content: string;
-  icon: keyof typeof dynamicIconImports;
-  color: Color;
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-  };
-};
 
 function parseFrontmatter(fileContent: string) {
   let match = frontmatterRegex.exec(fileContent);

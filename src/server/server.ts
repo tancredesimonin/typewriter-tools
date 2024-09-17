@@ -3,18 +3,20 @@ import {
   LocalizationsPaths,
   TypewriterConfig,
 } from "../shared/config/typewriter.config";
-import { getMDXPageHome, HomePage } from "./mdx/home-page";
-import { getMDXArticles, Article } from "./mdx/articles";
-import { getMDXPageArticlesList, PageArticlesList } from "./mdx/articles-list";
-import { getMDXCategories, Category } from "./mdx/categories";
-import {
-  getMDXPageCategoriesList,
-  PageCategoriesList,
-} from "./mdx/categories-list";
-import { getMDXTags, Tag } from "./mdx/tags";
-import { getMDXPageTagsList, PageTagsList } from "./mdx/tags-list";
-import { getMDXPageSeriesList, PageSeriesList } from "./mdx/series-list";
-import { getMDXSeries, Serie } from "./mdx/series";
+import { getMDXPageHome } from "./mdx/home-page";
+import { getMDXArticles } from "./mdx/articles";
+import { getMDXPageArticlesList } from "./mdx/articles-list";
+import { getMDXCategories } from "./mdx/categories";
+import { getMDXTags } from "./mdx/tags";
+import { getMDXPageTagsList } from "./mdx/tags-list";
+import { getMDXPageSeriesList } from "./mdx/series-list";
+import { HomePage } from "../shared/types/pages";
+import { Article, PageArticlesList } from "../shared/types/articles";
+import { Category, PageCategoriesList } from "../shared/types/categories";
+import { PageTagsList, Tag } from "../shared/types/tags";
+import { PageSeriesList, Serie } from "../shared/types/series";
+import { getMDXPageCategoriesList } from "./mdx/categories-list";
+import { getMDXSeries } from "./mdx/series";
 
 export class TypewriterContent<T extends string> {
   private data: {

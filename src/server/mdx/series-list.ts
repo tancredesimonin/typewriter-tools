@@ -6,6 +6,7 @@ import {
   removeQuotes,
 } from "../frontmatter/frontmatter.utils";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
+import { PageSeriesList } from "../../shared/types/series";
 
 export const MDX_SERIES_LIST_PAGE_FILE_NAME = "_series";
 
@@ -18,20 +19,6 @@ type MDXSerieslistPageMetadata = {
 const allowedKeys: Set<keyof MDXSerieslistPageMetadata> = new Set<
   keyof MDXSerieslistPageMetadata
 >(["title", "catchline", "description", "updatedAt"]);
-
-export type PageSeriesList = {
-  title: string;
-  catchline: string;
-  locale: string;
-  description: string;
-  updatedAt: string;
-  content: string;
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-  };
-  meta: {};
-};
 
 function parseFrontmatter(fileContent: string) {
   let match = frontmatterRegex.exec(fileContent);
