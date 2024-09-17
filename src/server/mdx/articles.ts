@@ -1,4 +1,4 @@
-import fs from "fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "path";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
 import {
@@ -84,7 +84,7 @@ function parseFrontmatter(fileContent: string) {
 }
 
 function readMDXFile(filePath: string) {
-  let rawContent = fs.readFileSync(filePath, "utf-8");
+  let rawContent = readFileSync(filePath, "utf-8");
   return parseFrontmatter(rawContent);
 }
 
@@ -93,6 +93,10 @@ function getMDXFileSlug(fileName: string): string {
   const withoutLocale = withoutDate.slice(0, -3);
 
   return withoutLocale;
+}
+
+function getMDXFileDate(fileName: string): string {
+  return fileName.slice(0, 10);
 }
 
 function validateCategoryExists(_categorySlug: string, _locale: string): void {
@@ -159,4 +163,52 @@ export function getMDXArticles(
       },
     };
   });
+}
+
+export function renameMDXArticleSlug(
+  file: string,
+  newSlug: string,
+  stage: TypewriterStage = "published"
+): void {
+  const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
+  const dir = path.join(process.cwd(), "content", stageFolder);
+
+  const filePath = path.join(dir, file);
+  if (!existsSync(filePath)) {
+    throw new Error(`File ${file} does not exist`);
+  }
+
+  let fileName = path.basename(file, path.extname(file));
+  let date = getMDXFileDate(fileName);
+  let locale = getMDXFileLocale(fileName);
+
+  const newFilePath = path.join(dir, `${date}-${newSlug}.${locale}.mdx`);
+  renameSync(path.join(dir, file), newFilePath);
+}
+
+export function upsertMDXArticle(
+  article: Article,
+  stage: TypewriterStage = "published"
+): void {
+  const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
+  const dir = path.join(process.cwd(), "content", stageFolder);
+  const articleFileName = `${article.publishedAt}-${article.slug}.${article.locale}.mdx`;
+  const articleFilePath = path.join(dir, articleFileName);
+
+  const articleContent = `---
+title: "${article.title}"
+catchline: "${article.catchline}"
+description: "${article.description}"
+publishedAt: ${article.publishedAt}
+updatedAt: ${article.updatedAt}
+category: ${article.meta.category}
+tags: [${article.meta.tags.map((tag) => `"${tag}"`).join(", ")}]
+${article.meta.serie ? `serie: ${article.meta.serie.slug}` : ""}
+${article.meta.serie ? `serieOrder: ${article.meta.serie.order}` : ""}
+---
+
+${article.content}
+`;
+
+  writeFileSync(articleFilePath, articleContent);
 }
