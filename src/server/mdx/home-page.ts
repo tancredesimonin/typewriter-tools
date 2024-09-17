@@ -7,6 +7,7 @@ import {
 } from "../frontmatter/frontmatter.utils";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
 import { HomePage } from "../../shared/types/pages";
+import { TypewriterStage } from "../../shared/config/typewriter.config";
 
 export const MDX_HOME_PAGE_FILE_NAME = "home";
 
@@ -75,8 +76,11 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent);
 }
 
-export function getMDXPageHome(): HomePage[] {
-  const dir = path.join(process.cwd(), "content/home");
+export function getMDXPageHome(
+  stage: TypewriterStage = "published"
+): HomePage[] {
+  const stageFolder = stage === "drafts" ? "home/drafts" : "home";
+  const dir = path.join(process.cwd(), "content", stageFolder);
 
   let mdxFilesInDir = getMDXFilesInDir(dir);
 

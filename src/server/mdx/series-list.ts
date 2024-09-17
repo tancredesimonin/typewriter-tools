@@ -7,6 +7,7 @@ import {
 } from "../frontmatter/frontmatter.utils";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
 import { PageSeriesList } from "../../shared/types/series";
+import { TypewriterStage } from "../../shared/config/typewriter.config";
 
 export const MDX_SERIES_LIST_PAGE_FILE_NAME = "_series";
 
@@ -74,8 +75,11 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent);
 }
 
-export function getMDXPageSeriesList(): PageSeriesList[] {
-  const dir = path.join(process.cwd(), "content/series");
+export function getMDXPageSeriesList(
+  stage: TypewriterStage = "published"
+): PageSeriesList[] {
+  const stageFolder = stage === "drafts" ? "series/drafts" : "series";
+  const dir = path.join(process.cwd(), "content", stageFolder);
 
   let mdxFilesInDir = getMDXFilesInDir(dir);
 

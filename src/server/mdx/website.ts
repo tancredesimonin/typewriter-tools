@@ -7,6 +7,7 @@ import {
   removeQuotes,
 } from "../frontmatter/frontmatter.utils";
 import { Website } from "../../shared/types/website";
+import { TypewriterStage } from "../../shared/config/typewriter.config";
 
 type MDXWebsite = {
   name: string;
@@ -69,8 +70,9 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent);
 }
 
-export function getMDXWebsite(): Website[] {
-  const dir = path.join(process.cwd(), "content/website");
+export function getMDXWebsite(stage: TypewriterStage = "published"): Website[] {
+  const stageFolder = stage === "drafts" ? "website/drafts" : "website";
+  const dir = path.join(process.cwd(), "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 

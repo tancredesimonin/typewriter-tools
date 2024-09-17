@@ -7,6 +7,7 @@ import {
   removeQuotes,
 } from "../frontmatter/frontmatter.utils";
 import { Article } from "../../shared/types/articles";
+import { TypewriterStage } from "../../shared/config/typewriter.config";
 
 type MDXArticleMetadata = {
   title: string;
@@ -112,8 +113,11 @@ function validateSerieExists(_serieSlug: string, _locale: string): void {
   // }
 }
 
-export function getMDXArticles(): Article[] {
-  const dir = path.join(process.cwd(), "content/articles");
+export function getMDXArticles(
+  stage: TypewriterStage = "published"
+): Article[] {
+  const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
+  const dir = path.join(process.cwd(), "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 

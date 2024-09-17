@@ -9,6 +9,7 @@ import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
 import { getDynamicColor } from "../../shared/utils/colors.utils";
 import { getDynamicIcon } from "../../shared/utils/icons.utils";
 import { Serie } from "../../shared/types/series";
+import { TypewriterStage } from "../../shared/config/typewriter.config";
 
 type MDXSerieMetadata = {
   title: string;
@@ -73,8 +74,9 @@ function getMDXFileSlug(fileName: string): string {
   return withoutLocale;
 }
 
-export function getMDXSeries(): Serie[] {
-  const dir = path.join(process.cwd(), "content/series");
+export function getMDXSeries(stage: TypewriterStage = "published"): Serie[] {
+  const stageFolder = stage === "drafts" ? "series/drafts" : "series";
+  const dir = path.join(process.cwd(), "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 

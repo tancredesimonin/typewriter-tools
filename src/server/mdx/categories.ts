@@ -9,6 +9,7 @@ import {
 import { getDynamicColor } from "../../shared/utils/colors.utils";
 import { getDynamicIcon } from "../../shared/utils/icons.utils";
 import { Category } from "../../shared/types/categories";
+import { TypewriterStage } from "../../shared/config/typewriter.config";
 
 type MDXCategoryMetadata = {
   title: string;
@@ -75,8 +76,11 @@ function getMDXFileSlug(fileName: string): string {
   return withoutLocale;
 }
 
-export function getMDXCategories(): Category[] {
-  const dir = path.join(process.cwd(), "content/categories");
+export function getMDXCategories(
+  stage: TypewriterStage = "published"
+): Category[] {
+  const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";
+  const dir = path.join(process.cwd(), "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 
