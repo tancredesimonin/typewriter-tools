@@ -76,7 +76,7 @@ export class TypewriterContent<T extends string> {
 
   get website() {
     return {
-      all: this.data.websites,
+      all: { websites: this.data.websites },
       byLocale: (locale: T) => {
         const website = this.data.websites.find(
           (website) => website.locale === locale
@@ -84,7 +84,7 @@ export class TypewriterContent<T extends string> {
         if (!website) {
           throw new Error(`No website found for locale ${locale}`);
         }
-        return website;
+        return { website };
       },
     };
   }
