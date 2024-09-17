@@ -48,6 +48,11 @@
       "import": "./dist/server/index.js",
       "require": "./dist/server/index.js",
       "types": "./dist/server/index.d.ts"
+    },
+    "./manager": {
+      "import": "./dist/manager/index.js",
+      "require": "./dist/manager/index.js",
+      "types": "./dist/manager/index.d.ts"
     }
   },
   "files": [

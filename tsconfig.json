@@ -5,6 +5,7 @@
     "typeRoots": [
       "./typewriter-tools/server",
       "./typewriter-tools/client",
+      "./typewriter-tools/manager",
       "node_modules/@types"
     ],
     "target": "es2015",
