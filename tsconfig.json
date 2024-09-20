@@ -10,7 +10,8 @@
       "node_modules/@types"
     ],
     "module": "ES2022",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "declaration": true,
     "outDir": "./dist",
