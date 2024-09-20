@@ -9,8 +9,8 @@
       "./typewriter-tools/shared",
       "node_modules/@types"
     ],
-    "module": "ES2022",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "declaration": true,

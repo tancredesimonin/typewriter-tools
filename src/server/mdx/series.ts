@@ -4,12 +4,12 @@ import {
   getMDXFileLocale,
   getMDXFilesInDir,
   removeQuotes,
-} from "../frontmatter/frontmatter.utils";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
-import { getDynamicColor } from "../../shared/utils/colors.utils";
-import { getDynamicIcon } from "../../shared/utils/icons.utils";
-import { Serie } from "../../shared/types/series";
-import { TypewriterStage } from "../../shared/config/typewriter.config";
+} from "../frontmatter/frontmatter.utils.js";
+import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
+import { getDynamicColor } from "../../shared/utils/colors.utils.js";
+import { getDynamicIcon } from "../../shared/utils/icons.utils.js";
+import { Serie } from "../../shared/types/series.js";
+import { TypewriterStage } from "../../shared/config/typewriter.config.js";
 
 type MDXSerieMetadata = {
   title: string;

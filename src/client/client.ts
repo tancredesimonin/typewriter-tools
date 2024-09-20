@@ -1,4 +1,4 @@
-import { TypewriterConfig } from "../shared/config/typewriter.config";
+import { TypewriterConfig } from "../shared/config/typewriter.config.js";
 
 export class TypewriterClientRouter<T extends string> {
   public baseUrl: string;

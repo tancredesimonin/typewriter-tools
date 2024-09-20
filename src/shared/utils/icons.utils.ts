@@ -1,4 +1,4 @@
-import dynamicIconImports from "lucide-react/dynamicIconImports";
+import dynamicIconImports from "lucide-react/dynamicIconImports.js";
 
 function isValidIconKey(icon: string): icon is keyof typeof dynamicIconImports {
   return icon in dynamicIconImports;
@@ -12,6 +12,6 @@ export function getDynamicIcon(icon?: string): keyof typeof dynamicIconImports {
   if (icon && isValidIconKey(icon)) return icon;
   else {
     console.warn(`invalid lucid icon key: ${icon}`);
-    return "circle-dot";
+    return "circle-dot" as keyof typeof dynamicIconImports;
   }
 }

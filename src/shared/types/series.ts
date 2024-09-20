@@ -1,5 +1,5 @@
-import dynamicIconImports from "lucide-react/dynamicIconImports";
-import { Color } from "../utils/colors.utils";
+import dynamicIconImports from "lucide-react/dynamicIconImports.js";
+import { Color } from "../utils/colors.utils.js";
 
 export type Serie = {
   title: string;

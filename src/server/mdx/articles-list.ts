@@ -4,10 +4,10 @@ import {
   getMDXFileLocale,
   getMDXFilesInDir,
   removeQuotes,
-} from "../frontmatter/frontmatter.utils";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
-import { PageArticlesList } from "../../shared/types/articles";
-import { TypewriterStage } from "../../shared/config/typewriter.config";
+} from "../frontmatter/frontmatter.utils.js";
+import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
+import { PageArticlesList } from "../../shared/types/articles.js";
+import { TypewriterStage } from "../../shared/config/typewriter.config.js";
 
 export const MDX_ARTICLES_LIST_PAGE_FILE_NAME = "_articles";
 

@@ -1,24 +1,24 @@
-import { TypewriterClientRouter } from "../client/client";
+import { TypewriterClientRouter } from "../client/client.js";
 import {
   LocalizationsPaths,
   TypewriterConfig,
-} from "../shared/config/typewriter.config";
-import { getMDXPageHome } from "./mdx/home-page";
-import { getMDXArticles } from "./mdx/articles";
-import { getMDXPageArticlesList } from "./mdx/articles-list";
-import { getMDXCategories } from "./mdx/categories";
-import { getMDXTags } from "./mdx/tags";
-import { getMDXPageTagsList } from "./mdx/tags-list";
-import { getMDXPageSeriesList } from "./mdx/series-list";
-import { HomePage } from "../shared/types/pages";
-import { Article, PageArticlesList } from "../shared/types/articles";
-import { Category, PageCategoriesList } from "../shared/types/categories";
-import { PageTagsList, Tag } from "../shared/types/tags";
-import { PageSeriesList, Serie } from "../shared/types/series";
-import { getMDXPageCategoriesList } from "./mdx/categories-list";
-import { getMDXSeries } from "./mdx/series";
-import { getMDXWebsite } from "./mdx/website";
-import { Website } from "../shared/types/website";
+} from "../shared/config/typewriter.config.js";
+import { getMDXPageHome } from "./mdx/home-page.js";
+import { getMDXArticles } from "./mdx/articles.js";
+import { getMDXPageArticlesList } from "./mdx/articles-list.js";
+import { getMDXCategories } from "./mdx/categories.js";
+import { getMDXTags } from "./mdx/tags.js";
+import { getMDXPageTagsList } from "./mdx/tags-list.js";
+import { getMDXPageSeriesList } from "./mdx/series-list.js";
+import { HomePage } from "../shared/types/pages.js";
+import { Article, PageArticlesList } from "../shared/types/articles.js";
+import { Category, PageCategoriesList } from "../shared/types/categories.js";
+import { PageTagsList, Tag } from "../shared/types/tags.js";
+import { PageSeriesList, Serie } from "../shared/types/series.js";
+import { getMDXPageCategoriesList } from "./mdx/categories-list.js";
+import { getMDXSeries } from "./mdx/series.js";
+import { getMDXWebsite } from "./mdx/website.js";
+import { Website } from "../shared/types/website.js";
 
 export class TypewriterContent<T extends string> {
   private stage: "drafts" | "published" = "published";

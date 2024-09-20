@@ -1,13 +1,13 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "path";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
+import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import {
   getMDXFileLocale,
   getMDXFilesInDir,
   removeQuotes,
-} from "../frontmatter/frontmatter.utils";
-import { Article } from "../../shared/types/articles";
-import { TypewriterStage } from "../../shared/config/typewriter.config";
+} from "../frontmatter/frontmatter.utils.js";
+import { Article } from "../../shared/types/articles.js";
+import { TypewriterStage } from "../../shared/config/typewriter.config.js";
 
 type MDXArticleMetadata = {
   title: string;

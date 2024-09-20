@@ -2,9 +2,9 @@ import {
   mapFromMDXToArticle,
   renameMDXArticleSlug,
   upsertMDXArticle,
-} from "../server/mdx/articles";
-import { TypewriterStage } from "../shared/config/typewriter.config";
-import { Article } from "../shared/types/articles";
+} from "../server/mdx/articles.js";
+import { TypewriterStage } from "../shared/config/typewriter.config.js";
+import { Article } from "../shared/types/articles.js";
 
 export class TypewriterManager {
   constructor() {}

@@ -1,1 +1,1 @@
-export * from "./locale-emoji";
+export * from "./locale-emoji.js";

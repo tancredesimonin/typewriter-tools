@@ -1,13 +1,13 @@
 import path from "path";
 import fs from "fs";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants";
+import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import {
   getMDXFileLocale,
   getMDXFilesInDir,
   removeQuotes,
-} from "../frontmatter/frontmatter.utils";
-import { Website } from "../../shared/types/website";
-import { TypewriterStage } from "../../shared/config/typewriter.config";
+} from "../frontmatter/frontmatter.utils.js";
+import { Website } from "../../shared/types/website.js";
+import { TypewriterStage } from "../../shared/config/typewriter.config.js";
 
 type MDXWebsite = {
   name: string;
