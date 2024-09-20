@@ -6,6 +6,7 @@
       "./typewriter-tools/server",
       "./typewriter-tools/client",
       "./typewriter-tools/manager",
+      "./typewriter-tools/shared",
       "node_modules/@types"
     ],
     "target": "esnext",
