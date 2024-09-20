@@ -9,3 +9,7 @@ declare module "typewriter-tools/client" {
 declare module "typewriter-tools/manager" {
   export * from "./dist/manager/index.js";
 }
+
+declare module "typewriter-tools/shared" {
+  export * from "./dist/shared/index.js";
+}

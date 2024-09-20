@@ -1,3 +1,3 @@
-export { TypewriterSitemapBuilder } from "./server";
-export { TypewriterContent } from "./server";
-export { TypewriterServer } from "./server";
+export { TypewriterSitemapBuilder } from "./server.js";
+export { TypewriterContent } from "./server.js";
+export { TypewriterServer } from "./server.js";

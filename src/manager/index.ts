@@ -1,1 +1,1 @@
-export { TypewriterManager } from "./manager";
+export { TypewriterManager } from "./manager.js";

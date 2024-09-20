@@ -54,6 +54,11 @@
       "import": "./dist/manager/index.js",
       "require": "./dist/manager/index.js",
       "types": "./dist/manager/index.d.ts"
+    },
+    "./shared": {
+      "import": "./dist/shared/index.js",
+      "require": "./dist/shared/index.js",
+      "types": "./dist/shared/index.d.ts"
     }
   },
   "files": [

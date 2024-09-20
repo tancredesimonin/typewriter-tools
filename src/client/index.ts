@@ -1,1 +1,1 @@
-export { TypewriterClient } from "./client";
+export { TypewriterClient } from "./client.js";
