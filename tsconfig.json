@@ -9,9 +9,8 @@
       "./typewriter-tools/shared",
       "node_modules/@types"
     ],
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "declaration": true,
     "outDir": "./dist",
