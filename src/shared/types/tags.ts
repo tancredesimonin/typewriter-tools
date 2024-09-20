@@ -1,5 +1,5 @@
-import dynamicIconImports from "lucide-react/dynamicIconImports.js";
 import { Color } from "../utils/colors.utils.js";
+import { IconName } from "../utils/icons.utils.js";
 
 export type Tag = {
   title: string;
@@ -8,7 +8,7 @@ export type Tag = {
   locale: string;
   description: string;
   content: string;
-  icon: keyof typeof dynamicIconImports;
+  icon: IconName;
   color: Color;
   seo: {
     metaTitle: string;

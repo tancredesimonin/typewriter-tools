@@ -28,9 +28,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {
-    "lucide-react": "^0.439.0"
-  },
+  "dependencies": {},
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
