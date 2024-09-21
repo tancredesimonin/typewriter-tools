@@ -6,6 +6,7 @@ const iconKeys = [
   "alarm-clock-off",
   "alarm-minus",
   "alarm-plus",
+  "alarm-smoke",
   "album",
   "alert-circle",
   "alert-octagon",

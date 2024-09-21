@@ -1,25 +1,28 @@
 import {
-  mapFromMDXToArticle,
   renameMDXArticleSlug,
   upsertMDXArticle,
 } from "../server/mdx/articles.js";
-import { TypewriterStage } from "../shared/config/typewriter.config.js";
+import {
+  TypewriterConfig,
+  TypewriterStage,
+} from "../shared/config/typewriter.config.js";
 import { Article } from "../shared/types/articles.js";
 
-export class TypewriterManager {
-  constructor() {}
+export class TypewriterManager<T extends string> {
+  private directory: string;
+  constructor(config: TypewriterConfig<T>) {
+    this.directory = config.directory ?? process.cwd();
+  }
 
   get articles() {
     return {
-      readFromFile: (file: string, stage: TypewriterStage = "published") =>
-        mapFromMDXToArticle(file, stage),
       rename: (
         file: string,
         newSlug: string,
         stage: TypewriterStage = "published"
-      ) => renameMDXArticleSlug(file, newSlug, stage),
+      ) => renameMDXArticleSlug(this.directory, file, newSlug, stage),
       upsert: (article: Article, stage: TypewriterStage = "published") =>
-        upsertMDXArticle(article, stage),
+        upsertMDXArticle(this.directory, article, stage),
     };
   }
 }

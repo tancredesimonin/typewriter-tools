@@ -132,12 +132,13 @@ export function getMDXArticles(
 }
 
 export function renameMDXArticleSlug(
+  directory: string,
   file: string,
   newSlug: string,
   stage: TypewriterStage = "published"
 ): void {
   const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   const filePath = path.join(dir, file);
   if (!existsSync(filePath)) {
@@ -153,10 +154,11 @@ export function renameMDXArticleSlug(
 }
 
 export function upsertMDXArticle(
+  directory: string,
   article: Article,
   stage: TypewriterStage = "published"
 ): void {
-  const { content, filePath } = mapFromArticleToMDX(article, stage);
+  const { content, filePath } = mapFromArticleToMDX(directory, article, stage);
 
   writeFileSync(filePath, content);
 }
@@ -201,11 +203,12 @@ export function mapFromMDXToArticle(dir: string, file: string): Article {
 }
 
 export function mapFromArticleToMDX(
+  directory: string,
   article: Article,
   stage: TypewriterStage = "published"
 ): { content: string; filePath: string } {
   const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
   const articleFileName = `${article.publishedAt}-${article.slug}.${article.locale}.mdx`;
   const articleFilePath = path.join(dir, articleFileName);
 
