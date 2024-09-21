@@ -70,9 +70,12 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent);
 }
 
-export function getMDXWebsite(stage: TypewriterStage = "published"): Website[] {
+export function getMDXWebsite(
+  directory: string,
+  stage: TypewriterStage = "published"
+): Website[] {
   const stageFolder = stage === "drafts" ? "website/drafts" : "website";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 

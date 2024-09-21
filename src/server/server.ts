@@ -21,7 +21,8 @@ import { getMDXWebsite } from "./mdx/website.js";
 import { Website } from "../shared/types/website.js";
 
 export class TypewriterContent<T extends string> {
-  private stage: "drafts" | "published" = "published";
+  private stage: "drafts" | "published";
+  private directory: string;
   private data: {
     websites: Website[];
     homePages: HomePage[];
@@ -37,20 +38,21 @@ export class TypewriterContent<T extends string> {
   private router: TypewriterClientRouter<T>;
 
   constructor(config: TypewriterConfig<T>, router: TypewriterClientRouter<T>) {
+    this.directory = config.directory ?? process.cwd();
     this.stage = config.stage ?? "published";
     this.router = router;
 
     this.data = {
-      websites: getMDXWebsite(this.stage),
-      homePages: getMDXPageHome(this.stage),
-      articles: getMDXArticles(this.stage),
+      websites: getMDXWebsite(this.directory, this.stage),
+      homePages: getMDXPageHome(this.directory, this.stage),
+      articles: getMDXArticles(this.directory, this.stage),
       articlesBasePage: getMDXPageArticlesList(this.stage),
-      categories: getMDXCategories(this.stage),
-      categoriesBasePage: getMDXPageCategoriesList(this.stage),
-      tags: getMDXTags(this.stage),
-      tagsBasePage: getMDXPageTagsList(this.stage),
-      series: getMDXSeries(this.stage),
-      seriesBasePage: getMDXPageSeriesList(this.stage),
+      categories: getMDXCategories(this.directory, this.stage),
+      categoriesBasePage: getMDXPageCategoriesList(this.directory, this.stage),
+      tags: getMDXTags(this.directory, this.stage),
+      tagsBasePage: getMDXPageTagsList(this.directory, this.stage),
+      series: getMDXSeries(this.directory, this.stage),
+      seriesBasePage: getMDXPageSeriesList(this.directory, this.stage),
     };
   }
 

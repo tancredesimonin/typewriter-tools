@@ -6,6 +6,10 @@ export function removeQuotes(value: string) {
 }
 
 export function getMDXFilesInDir(dir: string) {
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
+
   return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
 }
 

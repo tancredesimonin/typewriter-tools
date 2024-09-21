@@ -2,10 +2,11 @@ export type LocalizationsPaths<T extends string> = { [locale in T]: string };
 export type TypewriterStage = "drafts" | "published";
 
 export type TypewriterConfig<T extends string> = {
-  baseUrl: string;
+  directory?: string;
+  stage?: TypewriterStage;
   supportedLocales: readonly T[];
   defaultLocale: T;
-  stage?: TypewriterStage;
+  baseUrl: string;
   home: {
     label: Record<T, string>;
   };

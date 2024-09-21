@@ -77,10 +77,11 @@ function readMDXFile(filePath: string) {
 }
 
 export function getMDXPageHome(
+  directory: string,
   stage: TypewriterStage = "published"
 ): HomePage[] {
   const stageFolder = stage === "drafts" ? "home/drafts" : "home";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   let mdxFilesInDir = getMDXFilesInDir(dir);
 

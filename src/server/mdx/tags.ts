@@ -78,9 +78,12 @@ function getMDXFileSlug(fileName: string): string {
   return withoutLocale;
 }
 
-export function getMDXTags(stage: TypewriterStage = "published"): Tag[] {
+export function getMDXTags(
+  directory: string,
+  stage: TypewriterStage = "published"
+): Tag[] {
   const stageFolder = stage === "drafts" ? "tags/drafts" : "tags";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 

@@ -74,9 +74,12 @@ function getMDXFileSlug(fileName: string): string {
   return withoutLocale;
 }
 
-export function getMDXSeries(stage: TypewriterStage = "published"): Serie[] {
+export function getMDXSeries(
+  directory: string,
+  stage: TypewriterStage = "published"
+): Serie[] {
   const stageFolder = stage === "drafts" ? "series/drafts" : "series";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 

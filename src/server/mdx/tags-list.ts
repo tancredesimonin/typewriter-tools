@@ -76,10 +76,11 @@ function readMDXFile(filePath: string) {
 }
 
 export function getMDXPageTagsList(
+  directory: string,
   stage: TypewriterStage = "published"
 ): PageTagsList[] {
   const stageFolder = stage === "drafts" ? "tags/drafts" : "tags";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   let mdxFilesInDir = getMDXFilesInDir(dir);
 

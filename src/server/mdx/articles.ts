@@ -118,10 +118,11 @@ function validateSerieExists(_serieSlug: string, _locale: string): void {
 }
 
 export function getMDXArticles(
+  directory: string,
   stage: TypewriterStage = "published"
 ): Article[] {
   const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-  const dir = path.join(process.cwd(), "content", stageFolder);
+  const dir = path.join(directory, "content", stageFolder);
 
   let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
 
