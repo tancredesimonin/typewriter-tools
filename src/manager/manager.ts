@@ -1,4 +1,5 @@
 import {
+  publishMDXArticle,
   renameMDXArticleSlug,
   upsertMDXArticle,
 } from "../server/mdx/articles.js";
@@ -23,6 +24,7 @@ export class TypewriterManager<T extends string> {
       ) => renameMDXArticleSlug(this.directory, file, newSlug, stage),
       upsert: (article: Article, stage: TypewriterStage = "published") =>
         upsertMDXArticle(this.directory, article, stage),
+      publish: (article: Article) => publishMDXArticle(this.directory, article),
     };
   }
 }

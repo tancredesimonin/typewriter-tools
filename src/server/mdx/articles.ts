@@ -1,4 +1,10 @@
-import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import path from "path";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import {
@@ -153,6 +159,15 @@ export function renameMDXArticleSlug(
   renameSync(path.join(dir, file), newFilePath);
 }
 
+export function deleteMDXArticle(
+  directory: string,
+  article: Article,
+  stage: TypewriterStage = "published"
+): void {
+  const { filePath } = mapFromArticleToMDX(directory, article, stage);
+  rmSync(filePath);
+}
+
 export function upsertMDXArticle(
   directory: string,
   article: Article,
@@ -161,6 +176,11 @@ export function upsertMDXArticle(
   const { content, filePath } = mapFromArticleToMDX(directory, article, stage);
 
   writeFileSync(filePath, content);
+}
+
+export function publishMDXArticle(directory: string, article: Article): void {
+  upsertMDXArticle(directory, article, "published");
+  deleteMDXArticle(directory, article, "drafts");
 }
 
 export function mapFromMDXToArticle(dir: string, file: string): Article {
