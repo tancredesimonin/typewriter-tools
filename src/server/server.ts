@@ -4,10 +4,10 @@ import {
   TypewriterConfig,
 } from "../shared/config/typewriter.config.js";
 import { getMDXPageHome } from "./mdx/home-page.js";
-import { getMDXArticles } from "./mdx/articles.js";
+import { MDXArticleRepository } from "./mdx/articles.js";
 import { getMDXPageArticlesList } from "./mdx/articles-list.js";
-import { getMDXCategories } from "./mdx/categories.js";
-import { getMDXTags } from "./mdx/tags.js";
+import { MDXCategoryRepository } from "./mdx/categories.js";
+import { MDXTagRepository } from "./mdx/tags.js";
 import { getMDXPageTagsList } from "./mdx/tags-list.js";
 import { getMDXPageSeriesList } from "./mdx/series-list.js";
 import { HomePage } from "../shared/types/pages.js";
@@ -16,13 +16,19 @@ import { Category, PageCategoriesList } from "../shared/types/categories.js";
 import { PageTagsList, Tag } from "../shared/types/tags.js";
 import { PageSeriesList, Serie } from "../shared/types/series.js";
 import { getMDXPageCategoriesList } from "./mdx/categories-list.js";
-import { getMDXSeries } from "./mdx/series.js";
+import { MDXSerieRepository } from "./mdx/series.js";
 import { getMDXWebsite } from "./mdx/website.js";
 import { Website } from "../shared/types/website.js";
 
 export class TypewriterContent<T extends string> {
   private stage: "drafts" | "published";
   private directory: string;
+  private repository: {
+    articles: MDXArticleRepository;
+    categories: MDXCategoryRepository;
+    tags: MDXTagRepository;
+    series: MDXSerieRepository;
+  };
   private data: {
     websites: Website[];
     homePages: HomePage[];
@@ -42,16 +48,23 @@ export class TypewriterContent<T extends string> {
     this.stage = config.stage ?? "published";
     this.router = router;
 
+    this.repository = {
+      articles: new MDXArticleRepository(this.directory),
+      categories: new MDXCategoryRepository(this.directory),
+      tags: new MDXTagRepository(this.directory),
+      series: new MDXSerieRepository(this.directory),
+    };
+
     this.data = {
       websites: getMDXWebsite(this.directory, this.stage),
       homePages: getMDXPageHome(this.directory, this.stage),
-      articles: getMDXArticles(this.directory, this.stage),
+      articles: this.repository.articles.all(this.stage),
       articlesBasePage: getMDXPageArticlesList(this.stage),
-      categories: getMDXCategories(this.directory, this.stage),
+      categories: this.repository.categories.all(this.stage),
       categoriesBasePage: getMDXPageCategoriesList(this.directory, this.stage),
-      tags: getMDXTags(this.directory, this.stage),
+      tags: this.repository.tags.all(this.stage),
       tagsBasePage: getMDXPageTagsList(this.directory, this.stage),
-      series: getMDXSeries(this.directory, this.stage),
+      series: this.repository.series.all(this.stage),
       seriesBasePage: getMDXPageSeriesList(this.directory, this.stage),
     };
   }

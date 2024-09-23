@@ -20,78 +20,118 @@ type MDXCategoryMetadata = {
   color?: string;
 };
 
-const allowedKeys: Set<keyof MDXCategoryMetadata> = new Set<
-  keyof MDXCategoryMetadata
->(["title", "catchline", "description", "icon", "color"]);
+export class MDXCategoryRepository {
+  private readonly directory: string;
 
-function parseFrontmatter(fileContent: string) {
-  let match = frontmatterRegex.exec(fileContent);
-  if (!match) {
-    throw new Error("No frontmatter found in category file");
+  constructor(directory: string) {
+    this.directory = directory;
   }
 
-  let frontMatterBlock = match[1];
-  let content = fileContent.replace(frontmatterRegex, "").trim();
+  private static readonly allowedKeys = new Set<keyof MDXCategoryMetadata>([
+    "title",
+    "catchline",
+    "description",
+    "icon",
+    "color",
+  ] as const);
 
-  if (!frontMatterBlock) {
-    throw new Error("No frontmatter found in category file");
-  }
-
-  let frontMatterLines = frontMatterBlock.trim().split("\n");
-  let metadata: Partial<MDXCategoryMetadata> = {};
-
-  frontMatterLines.forEach((line) => {
-    let [key, ...valueArr] = line.split(": ");
-    if (!key) {
-      throw new Error(
-        `Invalid frontmatter key found in category: ${key} in file ${frontMatterBlock}`
-      );
+  private static parseFrontmatter(fileContent: string) {
+    let match = frontmatterRegex.exec(fileContent);
+    if (!match) {
+      throw new Error("No frontmatter found in category file");
     }
 
-    if (allowedKeys.has(key as keyof MDXCategoryMetadata)) {
-      let value = valueArr.join(": ").trim();
-      switch (key) {
-        default:
-          metadata[key as keyof MDXCategoryMetadata] = removeQuotes(
-            value
-          ) as any;
+    let frontMatterBlock = match[1];
+    let content = fileContent.replace(frontmatterRegex, "").trim();
+
+    if (!frontMatterBlock) {
+      throw new Error("No frontmatter found in category file");
+    }
+
+    let frontMatterLines = frontMatterBlock.trim().split("\n");
+    let metadata: Partial<MDXCategoryMetadata> = {};
+
+    frontMatterLines.forEach((line) => {
+      let [key, ...valueArr] = line.split(": ");
+      if (!key) {
+        throw new Error(
+          `Invalid frontmatter key found in category: ${key} in file ${frontMatterBlock}`
+        );
       }
-    } else {
-      throw new Error(
-        `Unknown frontmatter key found in category: ${key} in file ${frontMatterBlock}`
-      );
-    }
-  });
-  return { metadata: metadata as MDXCategoryMetadata, content };
-}
 
-function readMDXFile(filePath: string) {
-  let rawContent = fs.readFileSync(filePath, "utf-8");
-  return parseFrontmatter(rawContent);
-}
+      if (
+        MDXCategoryRepository.allowedKeys.has(key as keyof MDXCategoryMetadata)
+      ) {
+        let value = valueArr.join(": ").trim();
+        switch (key) {
+          default:
+            metadata[key as keyof MDXCategoryMetadata] = removeQuotes(
+              value
+            ) as any;
+        }
+      } else {
+        throw new Error(
+          `Unknown frontmatter key found in category: ${key} in file ${frontMatterBlock}`
+        );
+      }
+    });
+    return { metadata: metadata as MDXCategoryMetadata, content };
+  }
 
-function getMDXFileSlug(fileName: string): string {
-  const withoutLocale = fileName.slice(0, -3);
+  private readMDXFile(filePath: string) {
+    let rawContent = fs.readFileSync(filePath, "utf-8");
+    return MDXCategoryRepository.parseFrontmatter(rawContent);
+  }
 
-  return withoutLocale;
-}
+  private static getMDXFileSlug(fileName: string): string {
+    const withoutLocale = fileName.slice(0, -3);
 
-export function getMDXCategories(
-  directory: string,
-  stage: TypewriterStage = "published"
-): Category[] {
-  const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";
-  const dir = path.join(directory, "content", stageFolder);
+    return withoutLocale;
+  }
 
-  let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
+  public all(stage: TypewriterStage = "published"): Category[] {
+    const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";
+    const dir = path.join(this.directory, "content", stageFolder);
 
-  return mdxFiles.map((file) => {
-    let { metadata, content } = readMDXFile(path.join(dir, file));
+    let mdxFiles = getMDXFilesInDir(dir).filter(
+      (file) => !file.startsWith("_")
+    );
+
+    return mdxFiles.map((file) => {
+      return this.mapFromMDXToCategory(file);
+    });
+  }
+
+  public delete(
+    category: Category,
+    stage: TypewriterStage = "published"
+  ): void {
+    const { filePath } = this.mapFromCategoryToMDX(category, stage);
+    fs.rmSync(filePath);
+  }
+
+  public upsert(
+    category: Category,
+    stage: TypewriterStage = "published"
+  ): void {
+    const { content, filePath } = this.mapFromCategoryToMDX(category, stage);
+    fs.writeFileSync(filePath, content);
+  }
+
+  public publish(category: Category): void {
+    this.upsert(category, "published");
+    this.delete(category, "drafts");
+  }
+
+  public mapFromMDXToCategory(file: string): Category {
+    let { metadata, content } = this.readMDXFile(
+      path.join(this.directory, file)
+    );
 
     let fileName = path.basename(file, path.extname(file));
 
     let locale = getMDXFileLocale(fileName);
-    let slug = getMDXFileSlug(fileName);
+    let slug = MDXCategoryRepository.getMDXFileSlug(fileName);
 
     return {
       title: metadata.title,
@@ -107,5 +147,28 @@ export function getMDXCategories(
         metaDescription: metadata.description,
       },
     };
-  });
+  }
+
+  public mapFromCategoryToMDX(
+    category: Category,
+    stage: TypewriterStage = "published"
+  ): { content: string; filePath: string } {
+    const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";
+    const dir = path.join(this.directory, "content", stageFolder);
+    const fileName = `${category.slug}.${category.locale}.mdx`;
+    const filePath = path.join(dir, fileName);
+
+    const content = `---
+title: "${category.title}"
+catchline: "${category.catchline}"
+description: "${category.description}"
+icon: "${category.icon}"
+color: "${category.color}"
+---
+
+${category.content}
+`;
+
+    return { content, filePath };
+  }
 }

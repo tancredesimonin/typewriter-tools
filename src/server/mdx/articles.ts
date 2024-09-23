@@ -26,213 +26,191 @@ type MDXArticleMetadata = {
   category: string;
   tags: string[];
 };
-const allowedKeys: Set<keyof MDXArticleMetadata> = new Set<
-  keyof MDXArticleMetadata
->([
-  "title",
-  "catchline",
-  "description",
-  "publishedAt",
-  "updatedAt",
-  "serie",
-  "serieOrder",
-  "category",
-  "tags",
-]);
 
-function parseFrontmatter(fileContent: string) {
-  let match = frontmatterRegex.exec(fileContent);
-  if (!match) {
-    throw new Error("No frontmatter found in article file");
+export class MDXArticleRepository {
+  private readonly directory: string;
+
+  constructor(directory: string) {
+    this.directory = directory;
   }
 
-  let frontMatterBlock = match[1];
-  let content = fileContent.replace(frontmatterRegex, "").trim();
+  private static readonly allowedKeys = new Set([
+    "title",
+    "catchline",
+    "description",
+    "publishedAt",
+    "updatedAt",
+    "serie",
+    "serieOrder",
+    "category",
+    "tags",
+  ] as const);
 
-  if (!frontMatterBlock) {
-    throw new Error("No frontmatter found in article file");
-  }
-
-  let frontMatterLines = frontMatterBlock.trim().split("\n");
-  let metadata: Partial<MDXArticleMetadata> = {};
-
-  frontMatterLines.forEach((line) => {
-    let [key, ...valueArr] = line.split(": ");
-    if (!key) {
-      throw new Error(
-        `Invalid frontmatter key found in article: ${key} in file ${frontMatterBlock}`
-      );
+  private static parseFrontmatter(fileContent: string) {
+    let match = frontmatterRegex.exec(fileContent);
+    if (!match) {
+      throw new Error("No frontmatter found in article file");
     }
 
-    if (allowedKeys.has(key as keyof MDXArticleMetadata)) {
-      let value = valueArr.join(": ").trim();
-      switch (key) {
-        case "tags":
-          // Remove the brackets and split by commas
-          value = value.replace(/^\[|\]$/g, "");
-          metadata[key as keyof MDXArticleMetadata] = value
-            .split(",")
-            .map((tag) => removeQuotes(tag.trim())) as any;
-          break;
-        default:
-          metadata[key as keyof MDXArticleMetadata] = removeQuotes(
-            value
-          ) as any;
+    let frontMatterBlock = match[1];
+    let content = fileContent.replace(frontmatterRegex, "").trim();
+
+    if (!frontMatterBlock) {
+      throw new Error("No frontmatter found in article file");
+    }
+
+    let frontMatterLines = frontMatterBlock.trim().split("\n");
+    let metadata: Partial<MDXArticleMetadata> = {};
+
+    frontMatterLines.forEach((line) => {
+      let [key, ...valueArr] = line.split(": ");
+      if (!key) {
+        throw new Error(
+          `Invalid frontmatter key found in article: ${key} in file ${frontMatterBlock}`
+        );
       }
-    } else {
-      throw new Error(
-        `Unknown frontmatter key found in article: ${key} in file ${frontMatterBlock}`
-      );
-    }
-  });
 
-  return { metadata: metadata as MDXArticleMetadata, content };
-}
+      if (
+        MDXArticleRepository.allowedKeys.has(key as keyof MDXArticleMetadata)
+      ) {
+        let value = valueArr.join(": ").trim();
+        switch (key) {
+          case "tags":
+            // Remove the brackets and split by commas
+            value = value.replace(/^\[|\]$/g, "");
+            metadata[key as keyof MDXArticleMetadata] = value
+              .split(",")
+              .map((tag) => removeQuotes(tag.trim())) as any;
+            break;
+          default:
+            metadata[key as keyof MDXArticleMetadata] = removeQuotes(
+              value
+            ) as any;
+        }
+      } else {
+        throw new Error(
+          `Unknown frontmatter key found in article: ${key} in file ${frontMatterBlock}`
+        );
+      }
+    });
 
-function readMDXFile(filePath: string) {
-  let rawContent = readFileSync(filePath, "utf-8");
-  return parseFrontmatter(rawContent);
-}
-
-function getMDXFileSlug(fileName: string): string {
-  const withoutDate = fileName.slice(11);
-  const withoutLocale = withoutDate.slice(0, -3);
-
-  return withoutLocale;
-}
-
-function getMDXFileDate(fileName: string): string {
-  return fileName.slice(0, 10);
-}
-
-function validateCategoryExists(_categorySlug: string, _locale: string): void {
-  // const categoryExists = getCategoryBySlugForLocale(categorySlug, locale);
-  // if (!categoryExists) {
-  //   throw new Error(
-  //     `Category with slug ${categorySlug} does not exist for locale ${locale}`
-  //   );
-  // }
-}
-
-function validateSerieExists(_serieSlug: string, _locale: string): void {
-  // const serieExists = getSerieBySlugForLocale(serieSlug, locale);
-  // if (!serieExists) {
-  //   throw new Error(
-  //     `Serie with slug ${serieSlug} does not exist for locale ${locale}`
-  //   );
-  // }
-}
-
-export function getMDXArticles(
-  directory: string,
-  stage: TypewriterStage = "published"
-): Article[] {
-  const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-  const dir = path.join(directory, "content", stageFolder);
-
-  let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
-
-  return mdxFiles.map((file) => {
-    return mapFromMDXToArticle(dir, file);
-  });
-}
-
-export function renameMDXArticleSlug(
-  directory: string,
-  file: string,
-  newSlug: string,
-  stage: TypewriterStage = "published"
-): void {
-  const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-  const dir = path.join(directory, "content", stageFolder);
-
-  const filePath = path.join(dir, file);
-  if (!existsSync(filePath)) {
-    throw new Error(`File ${file} does not exist`);
+    return { metadata: metadata as MDXArticleMetadata, content };
   }
 
-  let fileName = path.basename(file, path.extname(file));
-  let date = getMDXFileDate(fileName);
-  let locale = getMDXFileLocale(fileName);
+  private static readMDXFile(filePath: string) {
+    let rawContent = readFileSync(filePath, "utf-8");
+    return this.parseFrontmatter(rawContent);
+  }
 
-  const newFilePath = path.join(dir, `${date}-${newSlug}.${locale}.mdx`);
-  renameSync(path.join(dir, file), newFilePath);
-}
+  private static getMDXFileSlug(fileName: string): string {
+    const withoutDate = fileName.slice(11);
+    const withoutLocale = withoutDate.slice(0, -3);
 
-export function deleteMDXArticle(
-  directory: string,
-  article: Article,
-  stage: TypewriterStage = "published"
-): void {
-  const { filePath } = mapFromArticleToMDX(directory, article, stage);
-  rmSync(filePath);
-}
+    return withoutLocale;
+  }
 
-export function upsertMDXArticle(
-  directory: string,
-  article: Article,
-  stage: TypewriterStage = "published"
-): void {
-  const { content, filePath } = mapFromArticleToMDX(directory, article, stage);
+  private static getMDXFileDate(fileName: string): string {
+    return fileName.slice(0, 10);
+  }
 
-  writeFileSync(filePath, content);
-}
+  public all(stage: TypewriterStage = "published"): Article[] {
+    const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
+    const dir = path.join(this.directory, "content", stageFolder);
 
-export function publishMDXArticle(directory: string, article: Article): void {
-  upsertMDXArticle(directory, article, "published");
-  deleteMDXArticle(directory, article, "drafts");
-}
+    let mdxFiles = getMDXFilesInDir(dir).filter(
+      (file) => !file.startsWith("_")
+    );
 
-export function mapFromMDXToArticle(dir: string, file: string): Article {
-  let { metadata, content } = readMDXFile(path.join(dir, file));
+    return mdxFiles.map((file) => {
+      return this.mapFromMDXToArticle(file);
+    });
+  }
 
-  let fileName = path.basename(file, path.extname(file));
-  let locale = getMDXFileLocale(fileName);
-  let slug = getMDXFileSlug(fileName);
-  let isInSerie: { slug: string; order: number } | undefined = undefined;
+  public renameSlug(
+    file: string,
+    newSlug: string,
+    stage: TypewriterStage = "published"
+  ): void {
+    const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
+    const dir = path.join(this.directory, "content", stageFolder);
 
-  validateCategoryExists(metadata.category, locale);
+    const filePath = path.join(dir, file);
+    if (!existsSync(filePath)) {
+      throw new Error(`File ${file} does not exist`);
+    }
 
-  if (metadata.serie && metadata.serieOrder) {
-    validateSerieExists(metadata.serie, locale);
-    isInSerie = {
-      slug: metadata.serie,
-      order: metadata.serieOrder,
+    let fileName = path.basename(file, path.extname(file));
+    let date = MDXArticleRepository.getMDXFileDate(fileName);
+    let locale = getMDXFileLocale(fileName);
+
+    const newFilePath = path.join(dir, `${date}-${newSlug}.${locale}.mdx`);
+    renameSync(path.join(dir, file), newFilePath);
+  }
+
+  public delete(article: Article, stage: TypewriterStage = "published"): void {
+    const { filePath } = this.mapFromArticleToMDX(article, stage);
+    rmSync(filePath);
+  }
+
+  public upsert(article: Article, stage: TypewriterStage = "published"): void {
+    const { content, filePath } = this.mapFromArticleToMDX(article, stage);
+
+    writeFileSync(filePath, content);
+  }
+
+  public publish(article: Article): void {
+    this.upsert(article, "published");
+    this.delete(article, "drafts");
+  }
+
+  public mapFromMDXToArticle(file: string): Article {
+    let { metadata, content } = MDXArticleRepository.readMDXFile(
+      path.join(this.directory, file)
+    );
+
+    let fileName = path.basename(file, path.extname(file));
+    let locale = getMDXFileLocale(fileName);
+    let slug = MDXArticleRepository.getMDXFileSlug(fileName);
+    let isInSerie: { slug: string; order: number } | undefined = undefined;
+
+    if (metadata.serie && metadata.serieOrder) {
+      isInSerie = {
+        slug: metadata.serie,
+        order: metadata.serieOrder,
+      };
+    }
+
+    return {
+      title: metadata.title,
+      catchline: metadata.catchline,
+      slug,
+      locale,
+      description: metadata.description,
+      publishedAt: metadata.publishedAt,
+      updatedAt: metadata.updatedAt ?? metadata.publishedAt,
+      content,
+      seo: {
+        metaTitle: metadata.title,
+        metaDescription: metadata.description,
+      },
+      meta: {
+        tags: metadata.tags,
+        category: metadata.category,
+        serie: isInSerie,
+      },
     };
   }
 
-  return {
-    title: metadata.title,
-    catchline: metadata.catchline,
-    slug,
-    locale,
-    description: metadata.description,
-    publishedAt: metadata.publishedAt,
-    updatedAt: metadata.updatedAt ?? metadata.publishedAt,
-    content,
-    seo: {
-      metaTitle: metadata.title,
-      metaDescription: metadata.description,
-    },
-    meta: {
-      tags: metadata.tags,
-      category: metadata.category,
-      serie: isInSerie,
-    },
-  };
-}
+  public mapFromArticleToMDX(
+    article: Article,
+    stage: TypewriterStage = "published"
+  ): { content: string; filePath: string } {
+    const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
+    const dir = path.join(this.directory, "content", stageFolder);
+    const fileName = `${article.publishedAt}-${article.slug}.${article.locale}.mdx`;
+    const filePath = path.join(dir, fileName);
 
-export function mapFromArticleToMDX(
-  directory: string,
-  article: Article,
-  stage: TypewriterStage = "published"
-): { content: string; filePath: string } {
-  const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-  const dir = path.join(directory, "content", stageFolder);
-  const articleFileName = `${article.publishedAt}-${article.slug}.${article.locale}.mdx`;
-  const articleFilePath = path.join(dir, articleFileName);
-
-  const articleContent = `---
+    const content = `---
 title: "${article.title}"
 catchline: "${article.catchline}"
 description: "${article.description}"
@@ -247,5 +225,6 @@ ${article.meta.serie ? `serieOrder: ${article.meta.serie.order}` : ""}
 ${article.content}
 `;
 
-  return { content: articleContent, filePath: articleFilePath };
+    return { content, filePath };
+  }
 }

@@ -20,76 +20,110 @@ type MDXSerieMetadata = {
   color?: string;
 };
 
-const allowedKeys: Set<keyof MDXSerieMetadata> = new Set<
-  keyof MDXSerieMetadata
->(["title", "catchline", "description", "icon", "color"]);
+export class MDXSerieRepository {
+  private readonly directory: string;
 
-function parseFrontmatter(fileContent: string) {
-  let match = frontmatterRegex.exec(fileContent);
-  if (!match) {
-    throw new Error("No frontmatter found in serie file");
+  constructor(directory: string) {
+    this.directory = directory;
   }
 
-  let frontMatterBlock = match[1];
-  let content = fileContent.replace(frontmatterRegex, "").trim();
+  private static readonly allowedKeys = new Set<keyof MDXSerieMetadata>([
+    "title",
+    "catchline",
+    "description",
+    "icon",
+    "color",
+  ]);
 
-  if (!frontMatterBlock) {
-    throw new Error("No frontmatter found in serie file");
-  }
-
-  let frontMatterLines = frontMatterBlock.trim().split("\n");
-  let metadata: Partial<MDXSerieMetadata> = {};
-
-  frontMatterLines.forEach((line) => {
-    let [key, ...valueArr] = line.split(": ");
-    if (!key) {
-      throw new Error(
-        `Invalid frontmatter key found in serie: ${key} in file ${frontMatterBlock}`
-      );
+  private static parseFrontmatter(fileContent: string) {
+    let match = frontmatterRegex.exec(fileContent);
+    if (!match) {
+      throw new Error("No frontmatter found in serie file");
     }
 
-    if (allowedKeys.has(key as keyof MDXSerieMetadata)) {
-      let value = valueArr.join(": ").trim();
-      switch (key) {
-        default:
-          metadata[key as keyof MDXSerieMetadata] = removeQuotes(value) as any;
+    let frontMatterBlock = match[1];
+    let content = fileContent.replace(frontmatterRegex, "").trim();
+
+    if (!frontMatterBlock) {
+      throw new Error("No frontmatter found in serie file");
+    }
+
+    let frontMatterLines = frontMatterBlock.trim().split("\n");
+    let metadata: Partial<MDXSerieMetadata> = {};
+
+    frontMatterLines.forEach((line) => {
+      let [key, ...valueArr] = line.split(": ");
+      if (!key) {
+        throw new Error(
+          `Invalid frontmatter key found in serie: ${key} in file ${frontMatterBlock}`
+        );
       }
-    } else {
-      throw new Error(
-        `Unknown frontmatter key found in serie: ${key} in file ${frontMatterBlock}`
-      );
-    }
-  });
-  return { metadata: metadata as MDXSerieMetadata, content };
-}
 
-function readMDXFile(filePath: string) {
-  let rawContent = fs.readFileSync(filePath, "utf-8");
-  return parseFrontmatter(rawContent);
-}
+      if (MDXSerieRepository.allowedKeys.has(key as keyof MDXSerieMetadata)) {
+        let value = valueArr.join(": ").trim();
+        switch (key) {
+          default:
+            metadata[key as keyof MDXSerieMetadata] = removeQuotes(
+              value
+            ) as any;
+        }
+      } else {
+        throw new Error(
+          `Unknown frontmatter key found in serie: ${key} in file ${frontMatterBlock}`
+        );
+      }
+    });
+    return { metadata: metadata as MDXSerieMetadata, content };
+  }
 
-function getMDXFileSlug(fileName: string): string {
-  const withoutLocale = fileName.slice(0, -3);
+  private static readMDXFile(filePath: string) {
+    let rawContent = fs.readFileSync(filePath, "utf-8");
+    return MDXSerieRepository.parseFrontmatter(rawContent);
+  }
 
-  return withoutLocale;
-}
+  private static getMDXFileSlug(fileName: string): string {
+    const withoutLocale = fileName.slice(0, -3);
 
-export function getMDXSeries(
-  directory: string,
-  stage: TypewriterStage = "published"
-): Serie[] {
-  const stageFolder = stage === "drafts" ? "series/drafts" : "series";
-  const dir = path.join(directory, "content", stageFolder);
+    return withoutLocale;
+  }
 
-  let mdxFiles = getMDXFilesInDir(dir).filter((file) => !file.startsWith("_"));
+  public all(stage: TypewriterStage = "published"): Serie[] {
+    const stageFolder = stage === "drafts" ? "series/drafts" : "series";
+    const dir = path.join(this.directory, "content", stageFolder);
 
-  return mdxFiles.map((file) => {
-    let { metadata, content } = readMDXFile(path.join(dir, file));
+    let mdxFiles = getMDXFilesInDir(dir).filter(
+      (file) => !file.startsWith("_")
+    );
+
+    return mdxFiles.map((file) => {
+      return this.mapFromMDXToSerie(file);
+    });
+  }
+
+  public delete(serie: Serie, stage: TypewriterStage = "published"): void {
+    const { filePath } = this.mapFromSerieToMDX(serie, stage);
+    fs.rmSync(filePath);
+  }
+
+  public upsert(serie: Serie, stage: TypewriterStage = "published"): void {
+    const { content, filePath } = this.mapFromSerieToMDX(serie, stage);
+    fs.writeFileSync(filePath, content);
+  }
+
+  public publish(serie: Serie): void {
+    this.upsert(serie, "published");
+    this.delete(serie, "drafts");
+  }
+
+  public mapFromMDXToSerie(file: string): Serie {
+    let { metadata, content } = MDXSerieRepository.readMDXFile(
+      path.join(this.directory, file)
+    );
 
     let fileName = path.basename(file, path.extname(file));
 
     let locale = getMDXFileLocale(fileName);
-    let slug = getMDXFileSlug(fileName);
+    let slug = MDXSerieRepository.getMDXFileSlug(fileName);
 
     return {
       title: metadata.title,
@@ -105,5 +139,28 @@ export function getMDXSeries(
         metaDescription: metadata.description,
       },
     };
-  });
+  }
+
+  public mapFromSerieToMDX(
+    serie: Serie,
+    stage: TypewriterStage = "published"
+  ): { content: string; filePath: string } {
+    const stageFolder = stage === "drafts" ? "series/drafts" : "series";
+    const dir = path.join(this.directory, "content", stageFolder);
+    const fileName = `${serie.slug}.${serie.locale}.mdx`;
+    const filePath = path.join(dir, fileName);
+
+    const content = `---
+title: "${serie.title}"
+catchline: "${serie.catchline}"
+description: "${serie.description}"
+icon: "${serie.icon}"
+color: "${serie.color}"
+---
+
+${serie.content}
+`;
+
+    return { content, filePath };
+  }
 }
