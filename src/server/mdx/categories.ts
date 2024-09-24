@@ -20,6 +20,11 @@ type MDXCategoryMetadata = {
   color?: string;
 };
 
+type CreateCategory = Partial<Category> & {
+  slug: string;
+  locale: string;
+};
+
 export class MDXCategoryRepository {
   private readonly directory: string;
 
@@ -111,7 +116,7 @@ export class MDXCategoryRepository {
   }
 
   public upsert(
-    category: Category,
+    category: CreateCategory,
     stage: TypewriterStage = "published"
   ): void {
     const { content, filePath } = this.mapFromCategoryToMDX(category, stage);
@@ -150,7 +155,7 @@ export class MDXCategoryRepository {
   }
 
   public mapFromCategoryToMDX(
-    category: Category,
+    category: CreateCategory,
     stage: TypewriterStage = "published"
   ): { content: string; filePath: string } {
     const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";

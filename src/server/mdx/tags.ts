@@ -20,6 +20,11 @@ type MDXTagsMetadata = {
   color?: string;
 };
 
+type CreateTag = Partial<Tag> & {
+  slug: string;
+  locale: string;
+};
+
 export class MDXTagRepository {
   private readonly directory: string;
 
@@ -99,7 +104,7 @@ export class MDXTagRepository {
     fs.rmSync(filePath);
   }
 
-  public upsert(tag: Tag, stage: TypewriterStage = "published"): void {
+  public upsert(tag: CreateTag, stage: TypewriterStage = "published"): void {
     const { content, filePath } = this.mapFromTagToMDX(tag, stage);
     fs.writeFileSync(filePath, content);
   }
@@ -136,7 +141,7 @@ export class MDXTagRepository {
   }
 
   public mapFromTagToMDX(
-    tag: Tag,
+    tag: CreateTag,
     stage: TypewriterStage = "published"
   ): {
     content: string;

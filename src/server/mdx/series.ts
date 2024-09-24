@@ -20,6 +20,11 @@ type MDXSerieMetadata = {
   color?: string;
 };
 
+type CreateSerie = Partial<Serie> & {
+  slug: string;
+  locale: string;
+};
+
 export class MDXSerieRepository {
   private readonly directory: string;
 
@@ -105,7 +110,10 @@ export class MDXSerieRepository {
     fs.rmSync(filePath);
   }
 
-  public upsert(serie: Serie, stage: TypewriterStage = "published"): void {
+  public upsert(
+    serie: CreateSerie,
+    stage: TypewriterStage = "published"
+  ): void {
     const { content, filePath } = this.mapFromSerieToMDX(serie, stage);
     fs.writeFileSync(filePath, content);
   }
@@ -142,7 +150,7 @@ export class MDXSerieRepository {
   }
 
   public mapFromSerieToMDX(
-    serie: Serie,
+    serie: CreateSerie,
     stage: TypewriterStage = "published"
   ): { content: string; filePath: string } {
     const stageFolder = stage === "drafts" ? "series/drafts" : "series";

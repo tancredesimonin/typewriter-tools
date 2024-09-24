@@ -14,6 +14,7 @@ import {
 } from "../frontmatter/frontmatter.utils.js";
 import { Article } from "../../shared/types/articles.js";
 import { TypewriterStage } from "../../shared/config/typewriter.config.js";
+import { formatDate } from "../../shared/index.js";
 
 type MDXArticleMetadata = {
   title: string;
@@ -25,6 +26,11 @@ type MDXArticleMetadata = {
   serieOrder?: number;
   category: string;
   tags: string[];
+};
+
+type CreateArticle = Partial<Article> & {
+  slug: string;
+  locale: string;
 };
 
 export class MDXArticleRepository {
@@ -152,7 +158,10 @@ export class MDXArticleRepository {
     rmSync(filePath);
   }
 
-  public upsert(article: Article, stage: TypewriterStage = "published"): void {
+  public upsert(
+    article: CreateArticle,
+    stage: TypewriterStage = "published"
+  ): void {
     const { content, filePath } = this.mapFromArticleToMDX(article, stage);
 
     writeFileSync(filePath, content);
@@ -202,24 +211,29 @@ export class MDXArticleRepository {
   }
 
   public mapFromArticleToMDX(
-    article: Article,
+    article: CreateArticle,
     stage: TypewriterStage = "published"
   ): { content: string; filePath: string } {
     const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
     const dir = path.join(this.directory, "content", stageFolder);
-    const fileName = `${article.publishedAt}-${article.slug}.${article.locale}.mdx`;
+
+    const publishedAt =
+      article.publishedAt ?? formatDate(new Date().toISOString());
+    const updatedAt = article.updatedAt ?? formatDate(new Date().toISOString());
+
+    const fileName = `${publishedAt}-${article.slug}.${article.locale}.mdx`;
     const filePath = path.join(dir, fileName);
 
     const content = `---
 title: "${article.title}"
 catchline: "${article.catchline}"
 description: "${article.description}"
-publishedAt: ${article.publishedAt}
-updatedAt: ${article.updatedAt}
-category: ${article.meta.category}
-tags: [${article.meta.tags.map((tag) => `"${tag}"`).join(", ")}]
-${article.meta.serie ? `serie: ${article.meta.serie.slug}` : ""}
-${article.meta.serie ? `serieOrder: ${article.meta.serie.order}` : ""}
+publishedAt: ${publishedAt}
+updatedAt: ${updatedAt}
+category: ${article.meta?.category}
+tags: [${article.meta?.tags.map((tag) => `"${tag}"`).join(", ")}]
+${article.meta?.serie ? `serie: ${article.meta.serie.slug}` : ""}
+${article.meta?.serie ? `serieOrder: ${article.meta.serie.order}` : ""}
 ---
 
 ${article.content}
