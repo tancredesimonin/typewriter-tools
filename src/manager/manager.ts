@@ -6,6 +6,7 @@ import { TypewriterConfig } from "../shared/config/typewriter.config.js";
 
 export class TypewriterManager<T extends string> {
   private directory: string;
+
   public articles: MDXArticleRepository;
   public categories: MDXCategoryRepository;
   public tags: MDXTagRepository;
