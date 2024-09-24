@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { existsSync, mkdirSync } from "fs";
 import path from "path";
 import {
   getMDXFileLocale,
@@ -27,9 +27,20 @@ type CreateTag = Partial<Tag> & {
 
 export class MDXTagRepository {
   private readonly directory: string;
+  private readonly publishedDir: string;
+  private readonly draftsDir: string;
 
   constructor(directory: string) {
     this.directory = directory;
+    this.publishedDir = path.join(this.directory, "content", "tags");
+    this.draftsDir = path.join(this.publishedDir, "drafts");
+
+    if (!existsSync(this.publishedDir)) {
+      mkdirSync(this.publishedDir);
+      if (!existsSync(this.draftsDir)) {
+        mkdirSync(this.draftsDir);
+      }
+    }
   }
 
   private static readonly allowedKeys: Set<keyof MDXTagsMetadata> = new Set<
@@ -87,8 +98,7 @@ export class MDXTagRepository {
   }
 
   public all(stage: TypewriterStage = "published"): Tag[] {
-    const stageFolder = stage === "drafts" ? "tags/drafts" : "tags";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
 
     let mdxFiles = getMDXFilesInDir(dir).filter(
       (file) => !file.startsWith("_")
@@ -145,8 +155,7 @@ export class MDXTagRepository {
     content: string;
     filePath: string;
   } {
-    const stageFolder = stage === "drafts" ? "tags/drafts" : "tags";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
     const fileName = `${tag.slug}.${tag.locale}.mdx`;
     const filePath = path.join(dir, fileName);
 

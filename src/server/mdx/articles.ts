@@ -1,5 +1,6 @@
 import {
   existsSync,
+  mkdirSync,
   readFileSync,
   renameSync,
   rmSync,
@@ -35,9 +36,20 @@ type CreateArticle = Partial<Article> & {
 
 export class MDXArticleRepository {
   private readonly directory: string;
+  private readonly publishedDir: string;
+  private readonly draftsDir: string;
 
   constructor(directory: string) {
     this.directory = directory;
+    this.publishedDir = path.join(this.directory, "content", "articles");
+    this.draftsDir = path.join(this.publishedDir, "drafts");
+
+    if (!existsSync(this.publishedDir)) {
+      mkdirSync(this.publishedDir);
+      if (!existsSync(this.draftsDir)) {
+        mkdirSync(this.draftsDir);
+      }
+    }
   }
 
   private static readonly allowedKeys = new Set([
@@ -120,9 +132,7 @@ export class MDXArticleRepository {
   }
 
   public all(stage: TypewriterStage = "published"): Article[] {
-    const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-    const dir = path.join(this.directory, "content", stageFolder);
-
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
     let mdxFiles = getMDXFilesInDir(dir).filter(
       (file) => !file.startsWith("_")
     );
@@ -137,8 +147,7 @@ export class MDXArticleRepository {
     newSlug: string,
     stage: TypewriterStage = "published"
   ): void {
-    const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
 
     const filePath = path.join(dir, file);
     if (!existsSync(filePath)) {
@@ -212,8 +221,7 @@ export class MDXArticleRepository {
     article: CreateArticle,
     stage: TypewriterStage = "published"
   ): { content: string; filePath: string } {
-    const stageFolder = stage === "drafts" ? "articles/drafts" : "articles";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
 
     const publishedAt =
       article.publishedAt ?? formatDate(new Date().toISOString());

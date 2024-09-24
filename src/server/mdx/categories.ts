@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { existsSync, mkdirSync } from "fs";
 import path from "path";
 import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import {
@@ -27,11 +27,21 @@ type CreateCategory = Partial<Category> & {
 
 export class MDXCategoryRepository {
   private readonly directory: string;
+  private readonly publishedDir: string;
+  private readonly draftsDir: string;
 
   constructor(directory: string) {
     this.directory = directory;
-  }
+    this.publishedDir = path.join(this.directory, "content", "categories");
+    this.draftsDir = path.join(this.publishedDir, "drafts");
 
+    if (!existsSync(this.publishedDir)) {
+      mkdirSync(this.publishedDir);
+      if (!existsSync(this.draftsDir)) {
+        mkdirSync(this.draftsDir);
+      }
+    }
+  }
   private static readonly allowedKeys = new Set<keyof MDXCategoryMetadata>([
     "title",
     "catchline",
@@ -95,8 +105,7 @@ export class MDXCategoryRepository {
   }
 
   public all(stage: TypewriterStage = "published"): Category[] {
-    const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
 
     let mdxFiles = getMDXFilesInDir(dir).filter(
       (file) => !file.startsWith("_")
@@ -156,8 +165,7 @@ export class MDXCategoryRepository {
     category: CreateCategory,
     stage: TypewriterStage = "published"
   ): { content: string; filePath: string } {
-    const stageFolder = stage === "drafts" ? "categories/drafts" : "categories";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
     const fileName = `${category.slug}.${category.locale}.mdx`;
     const filePath = path.join(dir, fileName);
 

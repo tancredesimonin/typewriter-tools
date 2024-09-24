@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { existsSync, mkdirSync } from "fs";
 import path from "path";
 import {
   getMDXFileLocale,
@@ -27,11 +27,21 @@ type CreateSerie = Partial<Serie> & {
 
 export class MDXSerieRepository {
   private readonly directory: string;
+  private readonly publishedDir: string;
+  private readonly draftsDir: string;
 
   constructor(directory: string) {
     this.directory = directory;
-  }
+    this.publishedDir = path.join(this.directory, "content", "series");
+    this.draftsDir = path.join(this.publishedDir, "drafts");
 
+    if (!existsSync(this.publishedDir)) {
+      mkdirSync(this.publishedDir);
+      if (!existsSync(this.draftsDir)) {
+        mkdirSync(this.draftsDir);
+      }
+    }
+  }
   private static readonly allowedKeys = new Set<keyof MDXSerieMetadata>([
     "title",
     "catchline",
@@ -93,9 +103,7 @@ export class MDXSerieRepository {
   }
 
   public all(stage: TypewriterStage = "published"): Serie[] {
-    const stageFolder = stage === "drafts" ? "series/drafts" : "series";
-    const dir = path.join(this.directory, "content", stageFolder);
-
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
     let mdxFiles = getMDXFilesInDir(dir).filter(
       (file) => !file.startsWith("_")
     );
@@ -151,8 +159,7 @@ export class MDXSerieRepository {
     serie: CreateSerie,
     stage: TypewriterStage = "published"
   ): { content: string; filePath: string } {
-    const stageFolder = stage === "drafts" ? "series/drafts" : "series";
-    const dir = path.join(this.directory, "content", stageFolder);
+    const dir = stage === "drafts" ? this.draftsDir : this.publishedDir;
     const fileName = `${serie.slug}.${serie.locale}.mdx`;
     const filePath = path.join(dir, fileName);
 
