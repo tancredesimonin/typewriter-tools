@@ -43,7 +43,9 @@ export class MDXArticleRepository {
     this.directory = directory;
     this.publishedDir = path.join(this.directory, "content", "articles");
     this.draftsDir = path.join(this.publishedDir, "drafts");
+  }
 
+  public setup() {
     if (!existsSync(this.publishedDir)) {
       mkdirSync(this.publishedDir);
       if (!existsSync(this.draftsDir)) {

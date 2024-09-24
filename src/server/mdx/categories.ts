@@ -34,7 +34,9 @@ export class MDXCategoryRepository {
     this.directory = directory;
     this.publishedDir = path.join(this.directory, "content", "categories");
     this.draftsDir = path.join(this.publishedDir, "drafts");
+  }
 
+  public setup() {
     if (!existsSync(this.publishedDir)) {
       mkdirSync(this.publishedDir);
       if (!existsSync(this.draftsDir)) {
