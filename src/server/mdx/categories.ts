@@ -39,9 +39,9 @@ export class MDXCategoryRepository {
   public setup() {
     if (!existsSync(this.publishedDir)) {
       mkdirSync(this.publishedDir);
-      if (!existsSync(this.draftsDir)) {
-        mkdirSync(this.draftsDir);
-      }
+    }
+    if (!existsSync(this.draftsDir)) {
+      mkdirSync(this.draftsDir);
     }
   }
   private static readonly allowedKeys = new Set<keyof MDXCategoryMetadata>([

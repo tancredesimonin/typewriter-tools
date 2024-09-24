@@ -39,9 +39,9 @@ export class MDXTagRepository {
   public setup() {
     if (!existsSync(this.publishedDir)) {
       mkdirSync(this.publishedDir);
-      if (!existsSync(this.draftsDir)) {
-        mkdirSync(this.draftsDir);
-      }
+    }
+    if (!existsSync(this.draftsDir)) {
+      mkdirSync(this.draftsDir);
     }
   }
 
