@@ -103,7 +103,7 @@ export class MDXCategoryRepository {
     );
 
     return mdxFiles.map((file) => {
-      return this.mapFromMDXToCategory(file);
+      return this.mapFromMDXToCategory(path.join(dir, file));
     });
   }
 
@@ -128,12 +128,10 @@ export class MDXCategoryRepository {
     this.delete(category, "drafts");
   }
 
-  public mapFromMDXToCategory(file: string): Category {
-    let { metadata, content } = this.readMDXFile(
-      path.join(this.directory, file)
-    );
+  public mapFromMDXToCategory(filePath: string): Category {
+    let { metadata, content } = this.readMDXFile(filePath);
 
-    let fileName = path.basename(file, path.extname(file));
+    let fileName = path.basename(filePath, path.extname(filePath));
 
     let locale = getMDXFileLocale(fileName);
     let slug = MDXCategoryRepository.getMDXFileSlug(fileName);

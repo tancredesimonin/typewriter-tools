@@ -128,7 +128,7 @@ export class MDXArticleRepository {
     );
 
     return mdxFiles.map((file) => {
-      return this.mapFromMDXToArticle(file);
+      return this.mapFromMDXToArticle(path.join(dir, file));
     });
   }
 
@@ -172,12 +172,10 @@ export class MDXArticleRepository {
     this.delete(article, "drafts");
   }
 
-  public mapFromMDXToArticle(file: string): Article {
-    let { metadata, content } = MDXArticleRepository.readMDXFile(
-      path.join(this.directory, file)
-    );
+  public mapFromMDXToArticle(filePath: string): Article {
+    let { metadata, content } = MDXArticleRepository.readMDXFile(filePath);
 
-    let fileName = path.basename(file, path.extname(file));
+    let fileName = path.basename(filePath, path.extname(filePath));
     let locale = getMDXFileLocale(fileName);
     let slug = MDXArticleRepository.getMDXFileSlug(fileName);
     let isInSerie: { slug: string; order: number } | undefined = undefined;

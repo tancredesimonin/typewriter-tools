@@ -95,7 +95,7 @@ export class MDXTagRepository {
     );
 
     return mdxFiles.map((file) => {
-      return this.mapFromMDXToTag(file);
+      return this.mapFromMDXToTag(path.join(dir, file));
     });
   }
 
@@ -114,12 +114,10 @@ export class MDXTagRepository {
     this.delete(tag, "drafts");
   }
 
-  public mapFromMDXToTag(file: string): Tag {
-    let { metadata, content } = MDXTagRepository.readMDXFile(
-      path.join(this.directory, file)
-    );
+  public mapFromMDXToTag(filePath: string): Tag {
+    let { metadata, content } = MDXTagRepository.readMDXFile(filePath);
 
-    let fileName = path.basename(file, path.extname(file));
+    let fileName = path.basename(filePath, path.extname(filePath));
 
     let locale = getMDXFileLocale(fileName);
     let slug = MDXTagRepository.getMDXFileSlug(fileName);
