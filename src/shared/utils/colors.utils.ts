@@ -1,4 +1,4 @@
-const validColors = [
+export const validColors = [
   "red",
   "orange",
   "amber",

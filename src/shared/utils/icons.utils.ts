@@ -1,4 +1,4 @@
-const iconKeys = [
+export const iconKeys = [
   "activity",
   "airplay",
   "alarm-check",

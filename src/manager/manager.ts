@@ -1,5 +1,6 @@
 import { MDXArticleRepository } from "../server/mdx/articles.js";
 import { MDXCategoryRepository } from "../server/mdx/categories.js";
+import { MDXOptionRepository } from "../server/mdx/options.js";
 import { MDXSerieRepository } from "../server/mdx/series.js";
 import { MDXTagRepository } from "../server/mdx/tags.js";
 import { TypewriterConfig } from "../shared/config/typewriter.config.js";
@@ -11,6 +12,7 @@ export class TypewriterManager<T extends string> {
   public categories: MDXCategoryRepository;
   public tags: MDXTagRepository;
   public series: MDXSerieRepository;
+  public options: MDXOptionRepository;
 
   constructor(config: TypewriterConfig<T>) {
     this.directory = config.directory ?? process.cwd();
@@ -19,5 +21,6 @@ export class TypewriterManager<T extends string> {
     this.categories = new MDXCategoryRepository(this.directory);
     this.tags = new MDXTagRepository(this.directory);
     this.series = new MDXSerieRepository(this.directory);
+    this.options = new MDXOptionRepository();
   }
 }
