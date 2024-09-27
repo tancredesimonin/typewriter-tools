@@ -1,13 +1,12 @@
-import fs from "fs";
+import { readFileSync } from "fs";
 import path from "path";
 import {
   getMDXFileLocale,
   getMDXFilesInDir,
-  removeQuotes,
 } from "../frontmatter/frontmatter.utils.js";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import { PageSeriesList } from "../../shared/types/series.js";
 import { TypewriterStage } from "../../shared/config/typewriter.config.js";
+import { parseFrontmatter } from "../frontmatter/frontmatter.parser.js";
 
 export const MDX_SERIES_LIST_PAGE_FILE_NAME = "_series";
 
@@ -21,58 +20,9 @@ const allowedKeys: Set<keyof MDXSerieslistPageMetadata> = new Set<
   keyof MDXSerieslistPageMetadata
 >(["title", "catchline", "description", "updatedAt"]);
 
-function parseFrontmatter(fileContent: string) {
-  let match = frontmatterRegex.exec(fileContent);
-  if (!match) {
-    throw new Error("No frontmatter found in page series list file");
-  }
-
-  let frontMatterBlock = match[1];
-  let content = fileContent.replace(frontmatterRegex, "").trim();
-
-  if (!frontMatterBlock) {
-    throw new Error("No frontmatter found in page series list file");
-  }
-
-  let frontMatterLines = frontMatterBlock.trim().split("\n");
-  let metadata: Partial<MDXSerieslistPageMetadata> = {};
-
-  frontMatterLines.forEach((line) => {
-    let [key, ...valueArr] = line.split(": ");
-    if (!key) {
-      throw new Error(
-        `Invalid frontmatter key found in page series list: ${key} in file ${frontMatterBlock}`
-      );
-    }
-
-    if (allowedKeys.has(key as keyof MDXSerieslistPageMetadata)) {
-      let value = valueArr.join(": ").trim();
-      switch (key) {
-        case "tags":
-          // Remove the brackets and split by commas
-          value = value.replace(/^\[|\]$/g, "");
-          metadata[key as keyof MDXSerieslistPageMetadata] = value
-            .split(",")
-            .map((tag) => removeQuotes(tag.trim())) as any;
-          break;
-        default:
-          metadata[key as keyof MDXSerieslistPageMetadata] = removeQuotes(
-            value
-          ) as any;
-      }
-    } else {
-      throw new Error(
-        `Unknown frontmatter key found in page series list: ${key} in file ${frontMatterBlock}`
-      );
-    }
-  });
-
-  return { metadata: metadata as MDXSerieslistPageMetadata, content };
-}
-
-function readMDXFile(filePath: string) {
-  let rawContent = fs.readFileSync(filePath, "utf-8");
-  return parseFrontmatter(rawContent);
+function readMDXFile(filePath: string, stage: TypewriterStage) {
+  let rawContent = readFileSync(filePath, "utf-8");
+  return parseFrontmatter(rawContent, stage, allowedKeys);
 }
 
 export function getMDXPageSeriesList(
@@ -90,7 +40,7 @@ export function getMDXPageSeriesList(
   );
 
   return mdxFilesPageArticlesList.map((file) => {
-    let { metadata, content } = readMDXFile(path.join(dir, file));
+    let { metadata, content } = readMDXFile(path.join(dir, file), stage);
 
     let fileName = path.basename(file, path.extname(file));
 

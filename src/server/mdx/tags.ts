@@ -1,15 +1,14 @@
-import fs, { existsSync, mkdirSync } from "fs";
+import fs, { existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
 import {
   getMDXFileLocale,
   getMDXFilesInDir,
-  removeQuotes,
 } from "../frontmatter/frontmatter.utils.js";
 import { getDynamicColor } from "../../shared/utils/colors.utils.js";
 import { getDynamicIcon } from "../../shared/utils/icons.utils.js";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import { Tag } from "../../shared/types/tags.js";
 import { TypewriterStage } from "../../shared/config/typewriter.config.js";
+import { parseFrontmatter } from "../frontmatter/frontmatter.parser.js";
 
 type MDXTagsMetadata = {
   title: string;
@@ -49,48 +48,13 @@ export class MDXTagRepository {
     keyof MDXTagsMetadata
   >(["title", "catchline", "description", "icon", "color"]);
 
-  private static parseFrontmatter(fileContent: string) {
-    let match = frontmatterRegex.exec(fileContent);
-    if (!match) {
-      throw new Error("No frontmatter found in tag file");
-    }
-
-    let frontMatterBlock = match[1];
-    let content = fileContent.replace(frontmatterRegex, "").trim();
-
-    if (!frontMatterBlock) {
-      throw new Error("No frontmatter found in tag file");
-    }
-
-    let frontMatterLines = frontMatterBlock.trim().split("\n");
-    let metadata: Partial<MDXTagsMetadata> = {};
-
-    frontMatterLines.forEach((line) => {
-      let [key, ...valueArr] = line.split(": ");
-      if (!key) {
-        throw new Error(
-          `Invalid frontmatter key found in tag: ${key} in file ${frontMatterBlock}`
-        );
-      }
-
-      if (MDXTagRepository.allowedKeys.has(key as keyof MDXTagsMetadata)) {
-        let value = valueArr.join(": ").trim();
-        switch (key) {
-          default:
-            metadata[key as keyof MDXTagsMetadata] = removeQuotes(value) as any;
-        }
-      } else {
-        throw new Error(
-          `Unknown frontmatter key found in tag: ${key} in file ${frontMatterBlock}`
-        );
-      }
-    });
-    return { metadata: metadata as MDXTagsMetadata, content };
-  }
-
-  private static readMDXFile(filePath: string) {
-    let rawContent = fs.readFileSync(filePath, "utf-8");
-    return MDXTagRepository.parseFrontmatter(rawContent);
+  private static readMDXFile(filePath: string, stage: TypewriterStage) {
+    let rawContent = readFileSync(filePath, "utf-8");
+    return parseFrontmatter<MDXTagsMetadata>(
+      rawContent,
+      stage,
+      MDXTagRepository.allowedKeys
+    );
   }
 
   private static getMDXFileSlug(fileName: string): string {
@@ -107,7 +71,7 @@ export class MDXTagRepository {
     );
 
     return mdxFiles.map((file) => {
-      return this.mapFromMDXToTag(path.join(dir, file));
+      return this.mapFromMDXToTag(path.join(dir, file), stage);
     });
   }
 
@@ -126,8 +90,8 @@ export class MDXTagRepository {
     this.delete(tag, "drafts");
   }
 
-  public mapFromMDXToTag(filePath: string): Tag {
-    let { metadata, content } = MDXTagRepository.readMDXFile(filePath);
+  public mapFromMDXToTag(filePath: string, stage: TypewriterStage): Tag {
+    let { metadata, content } = MDXTagRepository.readMDXFile(filePath, stage);
 
     let fileName = path.basename(filePath, path.extname(filePath));
 

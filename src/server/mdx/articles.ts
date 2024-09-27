@@ -7,15 +7,14 @@ import {
   writeFileSync,
 } from "node:fs";
 import path from "path";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import {
   getMDXFileLocale,
   getMDXFilesInDir,
-  removeQuotes,
 } from "../frontmatter/frontmatter.utils.js";
 import { Article } from "../../shared/types/articles.js";
 import { TypewriterStage } from "../../shared/config/typewriter.config.js";
 import { formatDate } from "../../shared/index.js";
+import { parseFrontmatter } from "../frontmatter/frontmatter.parser.js";
 
 type MDXArticleMetadata = {
   title: string;
@@ -66,60 +65,13 @@ export class MDXArticleRepository {
     "tags",
   ] as const);
 
-  private static parseFrontmatter(fileContent: string) {
-    let match = frontmatterRegex.exec(fileContent);
-    if (!match) {
-      throw new Error("No frontmatter found in article file");
-    }
-
-    let frontMatterBlock = match[1];
-    let content = fileContent.replace(frontmatterRegex, "").trim();
-
-    if (!frontMatterBlock) {
-      throw new Error("No frontmatter found in article file");
-    }
-
-    let frontMatterLines = frontMatterBlock.trim().split("\n");
-    let metadata: Partial<MDXArticleMetadata> = {};
-
-    frontMatterLines.forEach((line) => {
-      let [key, ...valueArr] = line.split(": ");
-      if (!key) {
-        throw new Error(
-          `Invalid frontmatter key found in article: ${key} in file ${frontMatterBlock}`
-        );
-      }
-
-      if (
-        MDXArticleRepository.allowedKeys.has(key as keyof MDXArticleMetadata)
-      ) {
-        let value = valueArr.join(": ").trim();
-        switch (key) {
-          case "tags":
-            // Remove the brackets and split by commas
-            value = value.replace(/^\[|\]$/g, "");
-            metadata[key as keyof MDXArticleMetadata] = value
-              .split(",")
-              .map((tag) => removeQuotes(tag.trim())) as any;
-            break;
-          default:
-            metadata[key as keyof MDXArticleMetadata] = removeQuotes(
-              value
-            ) as any;
-        }
-      } else {
-        throw new Error(
-          `Unknown frontmatter key found in article: ${key} in file ${frontMatterBlock}`
-        );
-      }
-    });
-
-    return { metadata: metadata as MDXArticleMetadata, content };
-  }
-
-  private static readMDXFile(filePath: string) {
+  private static readMDXFile(filePath: string, stage: TypewriterStage) {
     let rawContent = readFileSync(filePath, "utf-8");
-    return this.parseFrontmatter(rawContent);
+    return parseFrontmatter<MDXArticleMetadata>(
+      rawContent,
+      stage,
+      this.allowedKeys
+    );
   }
 
   private static getMDXFileSlug(fileName: string): string {
@@ -140,7 +92,7 @@ export class MDXArticleRepository {
     );
 
     return mdxFiles.map((file) => {
-      return this.mapFromMDXToArticle(path.join(dir, file));
+      return this.mapFromMDXToArticle(path.join(dir, file), stage);
     });
   }
 
@@ -183,8 +135,14 @@ export class MDXArticleRepository {
     this.delete(article, "drafts");
   }
 
-  public mapFromMDXToArticle(filePath: string): Article {
-    let { metadata, content } = MDXArticleRepository.readMDXFile(filePath);
+  public mapFromMDXToArticle(
+    filePath: string,
+    stage: TypewriterStage
+  ): Article {
+    let { metadata, content } = MDXArticleRepository.readMDXFile(
+      filePath,
+      stage
+    );
 
     let fileName = path.basename(filePath, path.extname(filePath));
     let locale = getMDXFileLocale(fileName);

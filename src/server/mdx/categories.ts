@@ -1,15 +1,14 @@
-import fs, { existsSync, mkdirSync } from "fs";
+import fs, { existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
-import { frontmatterRegex } from "../frontmatter/frontmatter.constants.js";
 import {
   getMDXFileLocale,
   getMDXFilesInDir,
-  removeQuotes,
 } from "../frontmatter/frontmatter.utils.js";
 import { getDynamicColor } from "../../shared/utils/colors.utils.js";
 import { getDynamicIcon } from "../../shared/utils/icons.utils.js";
 import { Category } from "../../shared/types/categories.js";
 import { TypewriterStage } from "../../shared/config/typewriter.config.js";
+import { parseFrontmatter } from "../frontmatter/frontmatter.parser.js";
 
 type MDXCategoryMetadata = {
   title: string;
@@ -44,6 +43,7 @@ export class MDXCategoryRepository {
       mkdirSync(this.draftsDir);
     }
   }
+
   private static readonly allowedKeys = new Set<keyof MDXCategoryMetadata>([
     "title",
     "catchline",
@@ -52,52 +52,13 @@ export class MDXCategoryRepository {
     "color",
   ] as const);
 
-  private static parseFrontmatter(fileContent: string) {
-    let match = frontmatterRegex.exec(fileContent);
-    if (!match) {
-      throw new Error("No frontmatter found in category file");
-    }
-
-    let frontMatterBlock = match[1];
-    let content = fileContent.replace(frontmatterRegex, "").trim();
-
-    if (!frontMatterBlock) {
-      throw new Error("No frontmatter found in category file");
-    }
-
-    let frontMatterLines = frontMatterBlock.trim().split("\n");
-    let metadata: Partial<MDXCategoryMetadata> = {};
-
-    frontMatterLines.forEach((line) => {
-      let [key, ...valueArr] = line.split(": ");
-      if (!key) {
-        throw new Error(
-          `Invalid frontmatter key found in category: ${key} in file ${frontMatterBlock}`
-        );
-      }
-
-      if (
-        MDXCategoryRepository.allowedKeys.has(key as keyof MDXCategoryMetadata)
-      ) {
-        let value = valueArr.join(": ").trim();
-        switch (key) {
-          default:
-            metadata[key as keyof MDXCategoryMetadata] = removeQuotes(
-              value
-            ) as any;
-        }
-      } else {
-        throw new Error(
-          `Unknown frontmatter key found in category: ${key} in file ${frontMatterBlock}`
-        );
-      }
-    });
-    return { metadata: metadata as MDXCategoryMetadata, content };
-  }
-
-  private readMDXFile(filePath: string) {
-    let rawContent = fs.readFileSync(filePath, "utf-8");
-    return MDXCategoryRepository.parseFrontmatter(rawContent);
+  private readMDXFile(filePath: string, stage: TypewriterStage) {
+    let rawContent = readFileSync(filePath, "utf-8");
+    return parseFrontmatter<MDXCategoryMetadata>(
+      rawContent,
+      stage,
+      MDXCategoryRepository.allowedKeys
+    );
   }
 
   private static getMDXFileSlug(fileName: string): string {
@@ -114,7 +75,7 @@ export class MDXCategoryRepository {
     );
 
     return mdxFiles.map((file) => {
-      return this.mapFromMDXToCategory(path.join(dir, file));
+      return this.mapFromMDXToCategory(path.join(dir, file), stage);
     });
   }
 
@@ -139,8 +100,11 @@ export class MDXCategoryRepository {
     this.delete(category, "drafts");
   }
 
-  public mapFromMDXToCategory(filePath: string): Category {
-    let { metadata, content } = this.readMDXFile(filePath);
+  public mapFromMDXToCategory(
+    filePath: string,
+    stage: TypewriterStage
+  ): Category {
+    let { metadata, content } = this.readMDXFile(filePath, stage);
 
     let fileName = path.basename(filePath, path.extname(filePath));
 
