@@ -136,14 +136,14 @@ export class MDXCategoryRepository {
     const filePath = path.join(dir, fileName);
 
     const content = `---
-title: "${category.title}"
-catchline: "${category.catchline}"
-description: "${category.description}"
-icon: "${category.icon}"
-color: "${category.color}"
+title: "${category.title ?? ""}"
+catchline: "${category.catchline ?? ""}"
+description: "${category.description ?? ""}"
+icon: "${category.icon ?? ""}"
+color: "${category.color ?? ""}"
 ---
 
-${category.content}
+${category.content ?? ""}
 `;
 
     return { content, filePath };

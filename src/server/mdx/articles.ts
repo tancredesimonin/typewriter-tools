@@ -191,18 +191,18 @@ export class MDXArticleRepository {
     const filePath = path.join(dir, fileName);
 
     const content = `---
-title: "${article.title}"
-catchline: "${article.catchline}"
-description: "${article.description}"
-publishedAt: ${publishedAt}
-updatedAt: ${updatedAt}
-category: ${article.meta?.category}
+title: "${article.title ?? ""}"
+catchline: "${article.catchline ?? ""}"
+description: "${article.description ?? ""}"
+publishedAt: ${publishedAt ?? ""}
+updatedAt: ${updatedAt ?? ""}
+category: ${article.meta?.category ?? ""}
 tags: [${article.meta?.tags.map((tag) => `"${tag}"`).join(", ")}]
-${article.meta?.serie ? `serie: ${article.meta.serie.slug}` : ""}
-${article.meta?.serie ? `serieOrder: ${article.meta.serie.order}` : ""}
+${article.meta?.serie ? `serie: ${article.meta.serie.slug ?? ""}` : ""}
+${article.meta?.serie ? `serieOrder: ${article.meta.serie.order ?? ""}` : ""}
 ---
 
-${article.content}
+${article.content ?? ""}
 `;
 
     return { content, filePath };

@@ -128,14 +128,14 @@ export class MDXSerieRepository {
     const filePath = path.join(dir, fileName);
 
     const content = `---
-title: "${serie.title}"
-catchline: "${serie.catchline}"
-description: "${serie.description}"
-icon: "${serie.icon}"
-color: "${serie.color}"
+title: "${serie.title ?? ""}"
+catchline: "${serie.catchline ?? ""}"
+description: "${serie.description ?? ""}"
+icon: "${serie.icon ?? ""}"
+color: "${serie.color ?? ""}"
 ---
 
-${serie.content}
+${serie.content ?? ""}
 `;
 
     return { content, filePath };

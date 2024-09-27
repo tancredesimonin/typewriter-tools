@@ -126,14 +126,14 @@ export class MDXTagRepository {
     const filePath = path.join(dir, fileName);
 
     const content = `---
-title: "${tag.title}"
-catchline: "${tag.catchline}"
-description: "${tag.description}"
-icon: "${tag.icon}"
-color: "${tag.color}"
+title: "${tag.title ?? ""}"
+catchline: "${tag.catchline ?? ""}"
+description: "${tag.description ?? ""}"
+icon: "${tag.icon ?? ""}"
+color: "${tag.color ?? ""}"
 ---
 
-${tag.content}
+${tag.content ?? ""}
 `;
 
     return { content, filePath };
