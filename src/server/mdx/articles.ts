@@ -135,6 +135,11 @@ export class MDXArticleRepository {
     this.delete(article, "drafts");
   }
 
+  public unpublish(article: Article): void {
+    this.upsert(article, "drafts");
+    this.delete(article, "published");
+  }
+
   public mapFromMDXToArticle(
     filePath: string,
     stage: TypewriterStage

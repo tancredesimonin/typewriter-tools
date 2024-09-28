@@ -95,6 +95,11 @@ export class MDXSerieRepository {
     this.delete(serie, "drafts");
   }
 
+  public unpublish(serie: Serie): void {
+    this.upsert(serie, "drafts");
+    this.delete(serie, "published");
+  }
+
   public mapFromMDXToSerie(filePath: string, stage: TypewriterStage): Serie {
     let { metadata, content } = MDXSerieRepository.readMDXFile(filePath, stage);
 

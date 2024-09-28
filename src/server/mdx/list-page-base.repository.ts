@@ -101,6 +101,11 @@ export class MDXListPageBaseRepository<U extends ListPageBase> {
     this.delete(pageList, "drafts");
   }
 
+  public unpublish(pageList: U): void {
+    this.upsert(pageList, "drafts");
+    this.delete(pageList, "published");
+  }
+
   private mapFromMDXToPageList(filePath: string, stage: TypewriterStage): U {
     let { metadata, content } = this.readMDXFile(filePath, stage);
 

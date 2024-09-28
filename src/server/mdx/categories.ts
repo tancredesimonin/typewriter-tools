@@ -100,6 +100,11 @@ export class MDXCategoryRepository {
     this.delete(category, "drafts");
   }
 
+  public unpublish(category: Category): void {
+    this.upsert(category, "drafts");
+    this.delete(category, "published");
+  }
+
   public mapFromMDXToCategory(
     filePath: string,
     stage: TypewriterStage

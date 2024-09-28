@@ -90,6 +90,11 @@ export class MDXTagRepository {
     this.delete(tag, "drafts");
   }
 
+  public unpublish(tag: Tag): void {
+    this.upsert(tag, "drafts");
+    this.delete(tag, "published");
+  }
+
   public mapFromMDXToTag(filePath: string, stage: TypewriterStage): Tag {
     let { metadata, content } = MDXTagRepository.readMDXFile(filePath, stage);
 
