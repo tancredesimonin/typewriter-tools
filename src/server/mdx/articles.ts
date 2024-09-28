@@ -196,10 +196,18 @@ catchline: "${article.catchline ?? ""}"
 description: "${article.description ?? ""}"
 publishedAt: ${publishedAt ?? ""}
 updatedAt: ${updatedAt ?? ""}
-category: ${article.meta?.category ?? ""}
+category: "${article.meta?.category ?? ""}"
 tags: [${article.meta?.tags.map((tag) => `"${tag}"`).join(", ")}]
-${article.meta?.serie ? `serie: ${article.meta.serie.slug ?? ""}` : ""}
-${article.meta?.serie ? `serieOrder: ${article.meta.serie.order ?? ""}` : ""}
+${
+  article.meta?.serie && article.meta.serie.slug
+    ? `serie: "${article.meta.serie.slug}"`
+    : ""
+}
+${
+  article.meta?.serie && article.meta.serie.order
+    ? `serieOrder: ${article.meta.serie.order}`
+    : ""
+}
 ---
 
 ${article.content ?? ""}

@@ -9,10 +9,10 @@ export class MDXOptionRepository {
   public readonly colors: Color[];
   public readonly defaultColors: { name: Color; hex: string }[];
   public readonly icons: IconName[];
+
   constructor() {
     this.colors = [...validColors];
     this.defaultColors = defaultColors;
-
     this.icons = [...iconKeys];
   }
 }

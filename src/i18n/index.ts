@@ -1,1 +1,1 @@
-export * from "./locale-emoji.js";
+export { getLocaleLabel } from "./locale-emoji.js";

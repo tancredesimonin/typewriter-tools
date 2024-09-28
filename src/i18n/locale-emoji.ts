@@ -732,7 +732,7 @@ const localesMap = {
   zza: "TR",
 };
 
-export function getLocaleLangCode(locale: string): string {
+function getLocaleLangCode(locale: string): string {
   const split = locale.toUpperCase().split(/-|_/);
   const lang = split.shift();
 
@@ -743,7 +743,7 @@ export function getLocaleLangCode(locale: string): string {
   return lang;
 }
 
-export function localeToEmoji(locale: string): string {
+function localeToEmoji(locale: string): string {
   const lang = getLocaleLangCode(locale);
   const split = locale.toUpperCase().split(/-|_/);
   let code = split.pop(); // Extract the region code (if any)
@@ -771,4 +771,9 @@ export function localeToEmoji(locale: string): string {
   );
 
   return firstFlagChar + secondFlagChar;
+}
+
+export function getLocaleLabel(locale: string): string {
+  const emoji = localeToEmoji(locale);
+  return `${locale.toUpperCase()} - ${emoji}`;
 }
