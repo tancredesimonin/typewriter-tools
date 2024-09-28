@@ -53,7 +53,7 @@ export class MDXArticleRepository {
     }
   }
 
-  private static readonly allowedKeys = new Set([
+  private static readonly allowedKeys = new Set<keyof MDXArticleMetadata>([
     "title",
     "catchline",
     "description",
@@ -63,7 +63,7 @@ export class MDXArticleRepository {
     "serieOrder",
     "category",
     "tags",
-  ] as const);
+  ]);
 
   private static readMDXFile(filePath: string, stage: TypewriterStage) {
     let rawContent = readFileSync(filePath, "utf-8");

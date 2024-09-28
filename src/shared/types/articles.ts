@@ -1,3 +1,5 @@
+import { ListPageBase } from "./pages.js";
+
 export type Article = {
   title: string;
   catchline: string;
@@ -21,16 +23,4 @@ export type Article = {
   };
 };
 
-export type PageArticlesList = {
-  title: string;
-  catchline: string;
-  locale: string;
-  description: string;
-  updatedAt: string;
-  content: string;
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-  };
-  meta: {};
-};
+export type PageArticlesList = ListPageBase;

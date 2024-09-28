@@ -1,5 +1,6 @@
 import { Color } from "../utils/colors.utils.js";
 import { IconName } from "../utils/icons.utils.js";
+import { ListPageBase } from "./pages.js";
 
 export type Serie = {
   title: string;
@@ -16,16 +17,4 @@ export type Serie = {
   };
 };
 
-export type PageSeriesList = {
-  title: string;
-  catchline: string;
-  locale: string;
-  description: string;
-  updatedAt: string;
-  content: string;
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-  };
-  meta: {};
-};
+export type PageSeriesList = ListPageBase;
