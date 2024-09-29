@@ -59,12 +59,19 @@ export class MDXListPageBaseRepository<U extends ListPageBase> {
     return parseFrontmatter(rawContent, stage, this.allowedKeys);
   }
 
-  public setup() {
+  public setup(locale: string) {
     if (!existsSync(this.publishedDir)) {
       mkdirSync(this.publishedDir);
     }
     if (!existsSync(this.draftsDir)) {
       mkdirSync(this.draftsDir);
+    }
+    const fileName = `${this.fileName}.${locale}.mdx`;
+    const draftFilePath = path.join(this.draftsDir, fileName);
+    const publishedFilePath = path.join(this.publishedDir, fileName);
+
+    if (!existsSync(draftFilePath) && !existsSync(publishedFilePath)) {
+      this.upsert({ locale }, "drafts");
     }
   }
 
