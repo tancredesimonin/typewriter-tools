@@ -3,11 +3,13 @@ import { MDXArticleRepository } from "../server/mdx/articles.js";
 import { MDXCategoryListPageRepository } from "../server/mdx/categories-list.js";
 import { MDXCategoryRepository } from "../server/mdx/categories.js";
 import { MDXOptionRepository } from "../server/mdx/options.js";
+import { MDXPageBaseRepository } from "../server/mdx/page-base.repository.js";
 import { MDXSeriesListPageRepository } from "../server/mdx/series-list.js";
 import { MDXSerieRepository } from "../server/mdx/series.js";
 import { MDXTagListPageRepository } from "../server/mdx/tags-list.js";
 import { MDXTagRepository } from "../server/mdx/tags.js";
 import { TypewriterConfig } from "../shared/config/typewriter.config.js";
+import { Page } from "../shared/index.js";
 
 export class TypewriterManager<T extends string> {
   private readonly directory: string;
@@ -21,6 +23,9 @@ export class TypewriterManager<T extends string> {
   public tagsList: MDXTagListPageRepository;
   public series: MDXSerieRepository;
   public seriesList: MDXSeriesListPageRepository;
+
+  public home: MDXPageBaseRepository<Page>;
+
   public options: MDXOptionRepository;
 
   constructor(config: TypewriterConfig<T>) {
@@ -36,6 +41,7 @@ export class TypewriterManager<T extends string> {
     this.series = new MDXSerieRepository(this.directory);
     this.seriesList = new MDXSeriesListPageRepository(this.directory);
     this.options = new MDXOptionRepository();
+    this.home = new MDXPageBaseRepository<Page>(this.directory, "home");
   }
 
   public setup() {
@@ -47,6 +53,7 @@ export class TypewriterManager<T extends string> {
     this.tagsList.setup();
     this.series.setup();
     this.seriesList.setup();
+    this.home.setup();
   }
 
   public forceFileCreation() {
@@ -55,6 +62,7 @@ export class TypewriterManager<T extends string> {
       this.categoriesList.forceFileCreation(locale);
       this.tagsList.forceFileCreation(locale);
       this.seriesList.forceFileCreation(locale);
+      this.home.forceFileCreation(locale);
     }
   }
 }
