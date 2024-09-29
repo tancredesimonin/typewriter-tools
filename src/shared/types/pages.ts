@@ -1,4 +1,4 @@
-export type HomePage = {
+export type PageBase = {
   title: string;
   catchline: string;
   locale: string;
@@ -11,6 +11,8 @@ export type HomePage = {
   };
   meta: {};
 };
+
+export type Page = PageBase;
 
 export type ListPageBase = {
   title: string;

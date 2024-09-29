@@ -3,11 +3,9 @@ import {
   LocalizationsPaths,
   TypewriterConfig,
 } from "../shared/config/typewriter.config.js";
-import { getMDXPageHome } from "./mdx/home-page.js";
 import { MDXArticleRepository } from "./mdx/articles.js";
 import { MDXCategoryRepository } from "./mdx/categories.js";
 import { MDXTagRepository } from "./mdx/tags.js";
-import { HomePage } from "../shared/types/pages.js";
 import { Article, PageArticlesList } from "../shared/types/articles.js";
 import { Category, PageCategoriesList } from "../shared/types/categories.js";
 import { PageTagsList, Tag } from "../shared/types/tags.js";
@@ -19,6 +17,8 @@ import { MDXArticleListPageRepository } from "./mdx/articles-list.js";
 import { MDXCategoryListPageRepository } from "./mdx/categories-list.js";
 import { MDXTagListPageRepository } from "./mdx/tags-list.js";
 import { MDXSeriesListPageRepository } from "./mdx/series-list.js";
+import { Page } from "../shared/index.js";
+import { MDXPageBaseRepository } from "./mdx/page-base.repository.js";
 
 export class TypewriterContent<T extends string> {
   private stage: "drafts" | "published";
@@ -32,10 +32,11 @@ export class TypewriterContent<T extends string> {
     tagsList: MDXTagListPageRepository;
     series: MDXSerieRepository;
     seriesList: MDXSeriesListPageRepository;
+    homePage: MDXPageBaseRepository<Page>;
   };
   private data: {
     websites: Website[];
-    homePages: HomePage[];
+    homePages: Page[];
     articles: Article[];
     articlesBasePage: PageArticlesList[];
     categories: Category[];
@@ -61,11 +62,12 @@ export class TypewriterContent<T extends string> {
       tagsList: new MDXTagListPageRepository(this.directory),
       series: new MDXSerieRepository(this.directory),
       seriesList: new MDXSeriesListPageRepository(this.directory),
+      homePage: new MDXPageBaseRepository<Page>(this.directory, "home"),
     };
 
     this.data = {
       websites: getMDXWebsite(this.directory, this.stage),
-      homePages: getMDXPageHome(this.directory, this.stage),
+      homePages: this.repository.homePage.all(this.stage),
       articles: this.repository.articles.all(this.stage),
       articlesBasePage: this.repository.articlesList.all(this.stage),
       categories: this.repository.categories.all(this.stage),
@@ -79,7 +81,7 @@ export class TypewriterContent<T extends string> {
 
   private findSinglePageLocalized(
     collection:
-      | HomePage[]
+      | Page[]
       | PageArticlesList[]
       | PageCategoriesList[]
       | PageSeriesList[]
@@ -91,7 +93,7 @@ export class TypewriterContent<T extends string> {
 
   private listSinglePageSupportedLocales(
     collection:
-      | HomePage[]
+      | Page[]
       | PageArticlesList[]
       | PageCategoriesList[]
       | PageSeriesList[]
