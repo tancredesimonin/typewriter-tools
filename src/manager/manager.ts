@@ -10,7 +10,8 @@ import { MDXTagRepository } from "../server/mdx/tags.js";
 import { TypewriterConfig } from "../shared/config/typewriter.config.js";
 
 export class TypewriterManager<T extends string> {
-  private directory: string;
+  private readonly directory: string;
+  private readonly supportedLocales: readonly T[];
 
   public articles: MDXArticleRepository;
   public articlesList: MDXArticleListPageRepository;
@@ -24,6 +25,7 @@ export class TypewriterManager<T extends string> {
 
   constructor(config: TypewriterConfig<T>) {
     this.directory = config.directory ?? process.cwd();
+    this.supportedLocales = config.supportedLocales;
 
     this.articles = new MDXArticleRepository(this.directory);
     this.articlesList = new MDXArticleListPageRepository(this.directory);
@@ -34,5 +36,25 @@ export class TypewriterManager<T extends string> {
     this.series = new MDXSerieRepository(this.directory);
     this.seriesList = new MDXSeriesListPageRepository(this.directory);
     this.options = new MDXOptionRepository();
+  }
+
+  public setup() {
+    this.articles.setup();
+    this.articlesList.setup();
+    this.categories.setup();
+    this.categoriesList.setup();
+    this.tags.setup();
+    this.tagsList.setup();
+    this.series.setup();
+    this.seriesList.setup();
+  }
+
+  public forceFileCreation() {
+    for (const locale of this.supportedLocales) {
+      this.articlesList.forceFileCreation(locale);
+      this.categoriesList.forceFileCreation(locale);
+      this.tagsList.forceFileCreation(locale);
+      this.seriesList.forceFileCreation(locale);
+    }
   }
 }
