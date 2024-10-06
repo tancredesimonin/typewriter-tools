@@ -23,6 +23,7 @@ import { MDXPageBaseRepository } from "./mdx/page-base.repository.js";
 export class TypewriterContent<T extends string> {
   private stage: "drafts" | "published";
   private directory: string;
+
   private repository: {
     articles: MDXArticleRepository;
     articlesList: MDXArticleListPageRepository;
@@ -145,6 +146,9 @@ export class TypewriterContent<T extends string> {
             this.router.home.path(homePage.locale as T);
         });
 
+        alternateLocalizationsPaths["x-default" as T] =
+          this.router.home.canonical;
+
         return {
           path,
           page,
@@ -197,6 +201,9 @@ export class TypewriterContent<T extends string> {
             alternateLocalizationsPaths[pageArticles.locale as T] =
               this.router.articles.path(pageArticles.locale as T);
           });
+
+          alternateLocalizationsPaths["x-default" as T] =
+            this.router.articles.canonical;
 
           return {
             path,
@@ -275,6 +282,8 @@ export class TypewriterContent<T extends string> {
             `No article found for slug ${slug} and locale ${locale}`
           );
         }
+        const path = this.router.articles.bySlug(article.slug).path(locale);
+        const canonical = this.router.articles.bySlug(article.slug).canonical;
 
         const alternateLocalizations = articlesWithSlug.filter(
           (article) => article.locale !== locale
@@ -292,8 +301,8 @@ export class TypewriterContent<T extends string> {
             this.router.articles.bySlug(article.slug).path(article.locale as T);
         });
 
-        const path = this.router.articles.bySlug(article.slug).path(locale);
-        const canonical = this.router.articles.bySlug(article.slug).canonical;
+        alternateLocalizationsPaths["x-default" as T] = canonical;
+
         return {
           path,
           canonical,
@@ -343,6 +352,8 @@ export class TypewriterContent<T extends string> {
             alternateLocalizationsPaths[pageCategories.locale as T] =
               this.router.categories.path(pageCategories.locale as T);
           });
+
+          alternateLocalizationsPaths["x-default" as T] = canonical;
 
           return {
             path,
@@ -417,6 +428,8 @@ export class TypewriterContent<T extends string> {
           category.slug
         ).canonical;
 
+        alternateLocalizationsPaths["x-default" as T] = canonical;
+
         return {
           path,
           category,
@@ -463,6 +476,8 @@ export class TypewriterContent<T extends string> {
             alternateLocalizationsPaths[pageTags.locale as T] =
               this.router.tags.path(pageTags.locale as T);
           });
+
+          alternateLocalizationsPaths["x-default" as T] = canonical;
 
           return {
             path,
@@ -526,6 +541,8 @@ export class TypewriterContent<T extends string> {
         const path = this.router.tags.bySlug(tag.slug).path(locale);
         const canonical = this.router.tags.bySlug(tag.slug).canonical;
 
+        alternateLocalizationsPaths["x-default" as T] = canonical;
+
         return {
           path,
           canonical,
@@ -573,6 +590,8 @@ export class TypewriterContent<T extends string> {
             alternateLocalizationsPaths[pageSeries.locale as T] =
               this.router.series.path(pageSeries.locale as T);
           });
+
+          alternateLocalizationsPaths["x-default" as T] = canonical;
 
           return {
             path,
@@ -641,6 +660,9 @@ export class TypewriterContent<T extends string> {
 
         const path = this.router.series.bySlug(serie.slug).path(locale);
         const canonical = this.router.series.bySlug(serie.slug).canonical;
+
+        alternateLocalizationsPaths["x-default" as T] = canonical;
+
         return {
           path,
           canonical,
