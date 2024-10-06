@@ -51,7 +51,7 @@ export class TypewriterClientRouter<T extends string> {
     return {
       segment,
       canonical: segment,
-      path: (locale: T) => `${locale}${segment}/`,
+      path: (locale: T) => `${locale}${segment}`,
       label: (locale: T) => this.getLabel(type, locale),
       bySlug: (slug: string) => ({
         canonical: `${segment}/${slug}`,
