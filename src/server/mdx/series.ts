@@ -72,9 +72,11 @@ export class MDXSerieRepository {
       (file) => !file.startsWith("_")
     );
 
-    return mdxFiles.map((file) => {
+    const series = mdxFiles.map((file) => {
       return this.mapFromMDXToSerie(path.join(dir, file), stage);
     });
+
+    return series.sort();
   }
 
   public delete(serie: Serie, stage: TypewriterStage = "published"): void {

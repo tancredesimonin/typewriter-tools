@@ -91,8 +91,14 @@ export class MDXArticleRepository {
       (file) => !file.startsWith("_")
     );
 
-    return mdxFiles.map((file) => {
+    const articles = mdxFiles.map((file) => {
       return this.mapFromMDXToArticle(path.join(dir, file), stage);
+    });
+
+    return articles.sort((a, b) => {
+      return (
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      );
     });
   }
 

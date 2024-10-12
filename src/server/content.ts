@@ -164,11 +164,6 @@ export class TypewriterContent<T extends string> {
     };
   }
 
-  /**
-   * Single Page Content For Base Page
-   * Dynamic Page Content For Articles
-   */
-
   get articles() {
     return {
       base: {

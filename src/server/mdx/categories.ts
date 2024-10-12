@@ -74,9 +74,11 @@ export class MDXCategoryRepository {
       (file) => !file.startsWith("_")
     );
 
-    return mdxFiles.map((file) => {
+    const categories = mdxFiles.map((file) => {
       return this.mapFromMDXToCategory(path.join(dir, file), stage);
     });
+
+    return categories.sort();
   }
 
   public delete(

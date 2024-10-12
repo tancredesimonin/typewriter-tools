@@ -70,9 +70,11 @@ export class MDXTagRepository {
       (file) => !file.startsWith("_")
     );
 
-    return mdxFiles.map((file) => {
+    const tags = mdxFiles.map((file) => {
       return this.mapFromMDXToTag(path.join(dir, file), stage);
     });
+
+    return tags.sort();
   }
 
   public delete(tag: Tag, stage: TypewriterStage = "published"): void {
