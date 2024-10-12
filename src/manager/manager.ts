@@ -25,7 +25,7 @@ export class TypewriterManager<T extends string> {
   public seriesList: MDXSeriesListPageRepository;
 
   public home: MDXPageBaseRepository<Page>;
-
+  public license: MDXPageBaseRepository<Page>;
   public options: MDXOptionRepository;
 
   constructor(config: TypewriterConfig<T>) {
@@ -42,6 +42,7 @@ export class TypewriterManager<T extends string> {
     this.seriesList = new MDXSeriesListPageRepository(this.directory);
     this.options = new MDXOptionRepository();
     this.home = new MDXPageBaseRepository<Page>(this.directory, "home");
+    this.license = new MDXPageBaseRepository<Page>(this.directory, "license");
   }
 
   public setup() {
@@ -54,6 +55,7 @@ export class TypewriterManager<T extends string> {
     this.series.setup();
     this.seriesList.setup();
     this.home.setup();
+    this.license.setup();
   }
 
   public forceFileCreation() {
@@ -63,6 +65,7 @@ export class TypewriterManager<T extends string> {
       this.tagsList.forceFileCreation(locale);
       this.seriesList.forceFileCreation(locale);
       this.home.forceFileCreation(locale);
+      this.license.forceFileCreation(locale);
     }
   }
 }
