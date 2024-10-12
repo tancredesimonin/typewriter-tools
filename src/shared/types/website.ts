@@ -4,4 +4,5 @@ export type Website = {
   publisher: string;
   twitterProfile: string;
   locale: string;
+  copyright: string;
 };

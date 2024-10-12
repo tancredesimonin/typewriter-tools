@@ -44,6 +44,7 @@ export function getMDXWebsite(
     let fileName = path.basename(file, path.extname(file));
 
     let locale = getMDXFileLocale(fileName);
+    const currentYear = new Date().getFullYear();
 
     return {
       name: metadata.name,
@@ -51,6 +52,7 @@ export function getMDXWebsite(
       publisher: metadata.publisher,
       twitterProfile: metadata.twitterProfile,
       locale,
+      copyright: `© ${currentYear} ${metadata.name}. All rights reserved.`,
     };
   });
 }
