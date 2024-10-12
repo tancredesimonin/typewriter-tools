@@ -373,9 +373,9 @@ export class TypewriterContent<T extends string> {
         return { categories, uniqueSlugs };
       },
       allByLocale: (locale: T) => {
-        const categories = this.data.categories.filter(
-          (category) => category.locale === locale
-        );
+        const categories = this.data.categories
+          .filter((category) => category.locale === locale)
+          .sort((a, b) => a.title.localeCompare(b.title));
 
         return { categories };
       },
@@ -497,7 +497,9 @@ export class TypewriterContent<T extends string> {
         return { tags, uniqueSlugs };
       },
       allByLocale: (locale: T) => {
-        const tags = this.data.tags.filter((tag) => tag.locale === locale);
+        const tags = this.data.tags
+          .filter((tag) => tag.locale === locale)
+          .sort((a, b) => a.title.localeCompare(b.title));
 
         return { tags };
       },
@@ -611,9 +613,9 @@ export class TypewriterContent<T extends string> {
         return { series, uniqueSlugs };
       },
       allByLocale: (locale: T) => {
-        const series = this.data.series.filter(
-          (series) => series.locale === locale
-        );
+        const series = this.data.series
+          .filter((series) => series.locale === locale)
+          .sort((a, b) => a.title.localeCompare(b.title));
 
         return { series };
       },
