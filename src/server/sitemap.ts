@@ -37,14 +37,23 @@ export class TypewriterSitemapBuilder<T extends string> {
     this.content = content;
   }
 
+  private forceAbsoluteUrl(url: string) {
+    return url.startsWith("/") ? `${this.config.baseUrl}${url}` : url;
+  }
+
   private appendDefaultLocalePathToAlternates(
     defaultLocalizedPath: string,
     alternates: LocalizationsPaths<T>
   ) {
     const alternatesWithDefault = {
-      ...alternates,
-      [this.config.defaultLocale]: defaultLocalizedPath,
-    };
+      ...Object.fromEntries(
+        Object.entries(alternates).map(([locale, path]) => [
+          locale,
+          this.forceAbsoluteUrl(path as string),
+        ])
+      ),
+      [this.config.defaultLocale]: this.forceAbsoluteUrl(defaultLocalizedPath),
+    } as LocalizationsPaths<T>;
     return alternatesWithDefault;
   }
 
@@ -57,8 +66,8 @@ export class TypewriterSitemapBuilder<T extends string> {
       .alternate.paths;
 
     return {
-      url: this.router.home.canonical,
-      priority: 1,
+      url: this.forceAbsoluteUrl(this.router.home.canonical),
+      priority: 1.0,
       changeFrequency: "daily",
       lastModified: new Date(),
       alternates: {
@@ -79,7 +88,7 @@ export class TypewriterSitemapBuilder<T extends string> {
     ).alternate.paths;
 
     return {
-      url: this.router.articles.canonical,
+      url: this.forceAbsoluteUrl(this.router.articles.canonical),
       priority: 0.9,
       changeFrequency: "daily",
       lastModified: new Date(),
@@ -100,7 +109,7 @@ export class TypewriterSitemapBuilder<T extends string> {
     ).alternate.paths;
 
     return {
-      url: this.router.categories.canonical,
+      url: this.forceAbsoluteUrl(this.router.categories.canonical),
       priority: 0.7,
       changeFrequency: "weekly",
       lastModified: new Date(),
@@ -121,7 +130,7 @@ export class TypewriterSitemapBuilder<T extends string> {
       .alternate.paths;
 
     return {
-      url: this.router.series.canonical,
+      url: this.forceAbsoluteUrl(this.router.series.canonical),
       priority: 0.5,
       changeFrequency: "weekly",
       lastModified: new Date(),
@@ -142,7 +151,7 @@ export class TypewriterSitemapBuilder<T extends string> {
       .alternate.paths;
 
     return {
-      url: this.router.tags.canonical,
+      url: this.forceAbsoluteUrl(this.router.tags.canonical),
       priority: 0.6,
       changeFrequency: "weekly",
       lastModified: new Date(),
@@ -166,7 +175,7 @@ export class TypewriterSitemapBuilder<T extends string> {
         );
 
         return {
-          url: canonical,
+          url: this.forceAbsoluteUrl(canonical),
           lastModified: article.updatedAt,
           changeFrequency: "daily",
           priority: 0.8,
@@ -194,7 +203,7 @@ export class TypewriterSitemapBuilder<T extends string> {
         );
 
         return {
-          url: canonical,
+          url: this.forceAbsoluteUrl(canonical),
           lastModified: new Date(),
           changeFrequency: "weekly",
           priority: 0.7,
@@ -221,7 +230,7 @@ export class TypewriterSitemapBuilder<T extends string> {
       );
 
       return {
-        url: canonical,
+        url: this.forceAbsoluteUrl(canonical),
         lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 0.5,
@@ -247,7 +256,7 @@ export class TypewriterSitemapBuilder<T extends string> {
       );
 
       return {
-        url: canonical,
+        url: this.forceAbsoluteUrl(canonical),
         lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 0.6,
