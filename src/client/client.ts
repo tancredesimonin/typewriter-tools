@@ -10,11 +10,13 @@ export class TypewriterClientRouter<T extends string> {
   }
 
   private getSegment(
-    type: "home" | "series" | "categories" | "tags" | "articles"
+    type: "home" | "license" | "series" | "categories" | "tags" | "articles"
   ): string {
     switch (type) {
       case "home":
         return "/";
+      case "license":
+        return this.config.license.segment;
       case "series":
         return this.config.series.segment;
       case "categories":
@@ -27,12 +29,14 @@ export class TypewriterClientRouter<T extends string> {
   }
 
   private getLabel(
-    type: "home" | "series" | "categories" | "tags" | "articles",
+    type: "home" | "license" | "series" | "categories" | "tags" | "articles",
     locale: T
   ): string {
     switch (type) {
       case "home":
         return this.config.home.label[locale];
+      case "license":
+        return this.config.license.label[locale];
       case "series":
         return this.config.series.label[locale];
       case "categories":
@@ -45,7 +49,7 @@ export class TypewriterClientRouter<T extends string> {
   }
 
   private createRouteObject(
-    type: "home" | "series" | "categories" | "tags" | "articles"
+    type: "home" | "license" | "series" | "categories" | "tags" | "articles"
   ) {
     const segment = this.getSegment(type);
     return {
@@ -62,6 +66,9 @@ export class TypewriterClientRouter<T extends string> {
 
   get home() {
     return this.createRouteObject("home");
+  }
+  get license() {
+    return this.createRouteObject("license");
   }
   get series() {
     return this.createRouteObject("series");
@@ -86,7 +93,7 @@ export class TypewriterClientRouter<T extends string> {
 
   private isPathOf(
     path: string,
-    type: "home" | "series" | "categories" | "tags" | "articles"
+    type: "home" | "license" | "series" | "categories" | "tags" | "articles"
   ): boolean {
     const firstPath = this.getFirstPath(path);
     return firstPath === this.getSegment(type);

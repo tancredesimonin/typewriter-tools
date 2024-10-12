@@ -34,10 +34,12 @@ export class TypewriterContent<T extends string> {
     series: MDXSerieRepository;
     seriesList: MDXSeriesListPageRepository;
     homePage: MDXPageBaseRepository<Page>;
+    licensePage: MDXPageBaseRepository<Page>;
   };
   private data: {
     websites: Website[];
     homePages: Page[];
+    licensePages: Page[];
     articles: Article[];
     articlesBasePage: PageArticlesList[];
     categories: Category[];
@@ -64,11 +66,13 @@ export class TypewriterContent<T extends string> {
       series: new MDXSerieRepository(this.directory),
       seriesList: new MDXSeriesListPageRepository(this.directory),
       homePage: new MDXPageBaseRepository<Page>(this.directory, "home"),
+      licensePage: new MDXPageBaseRepository<Page>(this.directory, "license"),
     };
 
     this.data = {
       websites: getMDXWebsite(this.directory, this.stage),
       homePages: this.repository.homePage.all(this.stage),
+      licensePages: this.repository.licensePage.all(this.stage),
       articles: this.repository.articles.all(this.stage),
       articlesBasePage: this.repository.articlesList.all(this.stage),
       categories: this.repository.categories.all(this.stage),
@@ -153,6 +157,55 @@ export class TypewriterContent<T extends string> {
           path,
           page,
           canonical: this.router.home.canonical,
+          supportedLocales,
+          alternate: {
+            locales: alternateLocales,
+            pages: alternateLocalizations,
+            paths: alternateLocalizationsPaths,
+          },
+        };
+      },
+    };
+  }
+
+  get license() {
+    return {
+      page: (locale: T) => {
+        const page = this.findSinglePageLocalized(
+          this.data.licensePages,
+          locale
+        );
+        if (!page) {
+          throw new Error(`No license page found for locale ${locale}`);
+        }
+
+        const path = this.router.license.path(locale);
+        const supportedLocales = this.listSinglePageSupportedLocales(
+          this.data.licensePages
+        );
+
+        const alternateLocalizations = this.data.licensePages.filter(
+          (licensePage) => licensePage.locale !== locale
+        );
+        const alternateLocales = alternateLocalizations.map(
+          (licensePage) => licensePage.locale
+        ) as T[];
+
+        const alternateLocalizationsPaths: LocalizationsPaths<T> =
+          {} as LocalizationsPaths<T>;
+
+        alternateLocalizations.forEach((licensePage) => {
+          alternateLocalizationsPaths[licensePage.locale as T] =
+            this.router.license.path(licensePage.locale as T);
+        });
+
+        alternateLocalizationsPaths["x-default" as T] =
+          this.router.license.canonical;
+
+        return {
+          path,
+          page,
+          canonical: this.router.license.canonical,
           supportedLocales,
           alternate: {
             locales: alternateLocales,

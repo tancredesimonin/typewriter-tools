@@ -10,6 +10,10 @@ export type TypewriterConfig<T extends string> = {
   home: {
     label: Record<T, string>;
   };
+  license: {
+    segment: string;
+    label: Record<T, string>;
+  };
   series: {
     segment: string;
     label: Record<T, string>;

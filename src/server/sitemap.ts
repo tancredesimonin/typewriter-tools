@@ -79,6 +79,28 @@ export class TypewriterSitemapBuilder<T extends string> {
     };
   }
 
+  public _buildLicensePageSitemap(): Sitemap<T> {
+    const defaultLocaleLicensePage = this.content.license.page(
+      this.config.defaultLocale
+    ).path;
+
+    const alternates = this.content.license.page(this.config.defaultLocale)
+      .alternate.paths;
+
+    return {
+      url: this.forceAbsoluteUrl(this.router.license.canonical),
+      priority: 1.0,
+      changeFrequency: "daily",
+      lastModified: new Date(),
+      alternates: {
+        languages: this.appendDefaultLocalePathToAlternates(
+          defaultLocaleLicensePage,
+          alternates
+        ),
+      },
+    };
+  }
+
   public _buildArticlesBasePageSitemap(): Sitemap<T> {
     const defaultLocaleArticlesBasePagePath = this.content.articles.base.page(
       this.config.defaultLocale
@@ -275,6 +297,7 @@ export class TypewriterSitemapBuilder<T extends string> {
   public buildAllPagesSitemap(): Sitemap<T>[] {
     return [
       this._buildHomePageSitemap(),
+      this._buildLicensePageSitemap(),
       this._buildArticlesBasePageSitemap(),
       this._buildCategoriesBasePageSitemap(),
       this._buildSeriesBasePageSitemap(),
