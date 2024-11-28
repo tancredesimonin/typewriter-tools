@@ -291,12 +291,16 @@ export class TypewriterContent<T extends string> {
         return { articles };
       },
       bySerie: (serieSlug: string, locale: T) => {
-        const articles = this.data.articles.filter(
-          (article) =>
-            article.meta.serie &&
-            article.meta.serie.slug === serieSlug &&
-            article.locale === locale
-        );
+        const articles = this.data.articles
+          .filter(
+            (article) =>
+              article.meta.serie &&
+              article.meta.serie.slug === serieSlug &&
+              article.locale === locale
+          )
+          .sort(
+            (a, b) => (a.meta?.serie?.order ?? 0) - (b.meta?.serie?.order ?? 0)
+          );
 
         return { articles };
       },
